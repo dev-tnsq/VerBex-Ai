@@ -566,17 +566,17 @@ ${JSON.stringify(data.result, null, 2)}
     <div className="flex min-h-screen bg-retro font-pixel">
       <Sidebar collapsible="icon" className="sidebar-retro border-r pixel-border shadow-lg">
         <SidebarHeader>
-          <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3">
             <div className="w-10 h-10 pixel-border bg-retro flex items-center justify-center shadow-md">
-              <Coins className="w-6 h-6 neon" />
-            </div>
+                  <Coins className="w-6 h-6 neon" />
+                </div>
             {state === "expanded" && (
-              <div>
+                <div>
                 <h1 className="sidebar-title">Verbex AI</h1>
-                <p className="sidebar-subtitle">Intelligent DeFi Companion</p>
+                <p className="sidebar-subtitle">Future of DeFi</p>
               </div>
             )}
-          </div>
+            </div>
         </SidebarHeader>
         <SidebarContent>
             <Button
@@ -593,22 +593,22 @@ ${JSON.stringify(data.result, null, 2)}
           {!connected && state === "expanded" && (
             <SidebarMenuItem className="sidebar-menu-item">
               <div className="px-2 py-2 text-xs neon opacity-70">
-                Connect wallet to access your DeFi journey
+                Connect wallet to see chats
               </div>
             </SidebarMenuItem>
           )}
           {loadingThreads && state === "expanded" && (
             <SidebarMenuItem className="sidebar-menu-item">
               <div className="px-2 py-2 text-xs neon opacity-70">
-                Loading your conversations...
-              </div>
+                Loading chats...
+          </div>
             </SidebarMenuItem>
           )}
           {connected && !loadingThreads && chatThreads.length === 0 && state === "expanded" && (
             <SidebarMenuItem className="sidebar-menu-item">
               <div className="px-2 py-2 text-xs neon opacity-70">
-                Ready to optimize your DeFi strategy?
-              </div>
+                No chats yet. Start a conversation!
+            </div>
             </SidebarMenuItem>
           )}
           {chatThreads.map((thread) => (
@@ -642,11 +642,11 @@ ${JSON.stringify(data.result, null, 2)}
                   {connected && publicKey ? (
                     <span className="font-mono">{publicKey.slice(0, 6)}...{publicKey.slice(-4)}</span>
                   ) : (
-                    <span className="neon">Ready to Connect</span>
+                    <span className="neon">Not Connected</span>
                   )}
                 </p>
                 <p className="text-xs neon mt-0.5">
-                  {connected ? "Wallet Connected" : "Connect to get started"}
+                  {connected ? "Wallet Connected" : "Connect your wallet"}
                 </p>
               </div>
             )}
@@ -661,14 +661,14 @@ ${JSON.stringify(data.result, null, 2)}
             <SidebarTrigger />
             <div className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 neon" />
-              <h2 className="text-lg font-semibold neon">DeFi Intelligence Hub</h2>
+              <h2 className="text-lg font-semibold neon">DeFi Dashboard</h2>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {/* Status Indicator */}
             <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-retro pixel-border">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-xs neon">{connected ? "Connected" : "Disconnected"}</span>
+              <span className="text-xs neon">Wallet Status</span>
             </div>
             <Dialog open={walletModalOpen} onOpenChange={setWalletModalOpen}>
               <DialogTrigger asChild>
@@ -681,8 +681,8 @@ ${JSON.stringify(data.result, null, 2)}
                   <VisuallyHidden>Wallet Connection</VisuallyHidden>
                 </DialogTitle>
                <DialogDescription className="modal-description">
-                 Connect your Stellar wallet to unlock personalized DeFi insights, portfolio optimization, and intelligent trading strategies.
-               </DialogDescription>
+                  Connect your Stellar wallet to interact with Web3 features. Your address and status will appear below.
+                </DialogDescription>
                 <FreighterWallet onConnect={handleWalletConnect} onDisconnect={handleWalletDisconnect} />
               </DialogContent>
             </Dialog>
@@ -700,17 +700,17 @@ ${JSON.stringify(data.result, null, 2)}
                   <div className="w-16 h-16 rounded-none pixel-border bg-retro flex items-center justify-center mx-auto mb-4">
                     <Wallet className="w-8 h-8 neon" />
                   </div>
-                  <h3 className="text-xl font-semibold neon mb-2">Welcome to the Future of DeFi</h3>
-                  <p className="neon mb-6">Connect your wallet to unlock AI-powered portfolio management, yield optimization, and intelligent trading across Stellar's top protocols.</p>
+                  <h3 className="text-xl font-semibold neon mb-2">Please connect your wallet to use the dashboard.</h3>
+                  <p className="neon mb-6">Connect your wallet to access DeFi features, manage your assets, and interact with the blockchain.</p>
                 </div>
               ) : !selectedThreadId && connected ? (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 rounded-none pixel-border bg-retro flex items-center justify-center mx-auto mb-4">
                     <MessageSquare className="w-8 h-8 neon" />
                   </div>
-                  <h3 className="text-xl font-semibold neon mb-2">Ready to Optimize Your DeFi Strategy?</h3>
+                  <h3 className="text-xl font-semibold neon mb-2">Select a chat or start a new conversation</h3>
                   <p className="neon mb-6">
-                    Start a new conversation or select an existing one to get personalized recommendations.
+                    Choose an existing chat from the sidebar or create a new one to begin.
                   </p>
                 </div>
               ) : messages.length === 0 && (
@@ -718,34 +718,34 @@ ${JSON.stringify(data.result, null, 2)}
                   <div className="w-16 h-16 rounded-none pixel-border bg-retro flex items-center justify-center mx-auto mb-4">
                     <Coins className="w-8 h-8 neon" />
                   </div>
-                  <h3 className="text-xl font-semibold neon mb-2">Your Intelligent DeFi Companion</h3>
+                  <h3 className="text-xl font-semibold neon mb-2">Welcome to Verbex DeFi Dashboard</h3>
                   <p className="neon mb-6">
-                    I'm here to help you navigate Blend lending, Soroswap trading, DeFindex strategies, and portfolio optimization with AI-powered insights.
+                    Manage your assets, swap tokens, provide liquidity, and track your DeFi activity on Stellar.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">
                     <Card 
                       className="p-4 bg-retro pixel-border hover:bg-green-900/30 cursor-pointer transition-colors"
-                      onClick={() => setInput("Show my complete DeFi portfolio across all protocols")}
+                      onClick={() => setInput("Lend 100 XLM to the main pool")}
                     >
-                      <p className="text-sm neon">📊 Analyze my complete portfolio</p>
+                      <p className="text-sm neon">💰 Lend 100 XLM to the main pool</p>
                     </Card>
                     <Card 
                       className="p-4 bg-retro pixel-border hover:bg-green-900/30 cursor-pointer transition-colors"
-                      onClick={() => setInput("Find the best yield opportunities for my risk tolerance")}
+                      onClick={() => setInput("Swap 50 XLM for USDC using Soroswap")}
                     >
-                      <p className="text-sm neon">🎯 Find optimal yield strategies</p>
+                      <p className="text-sm neon">🔄 Swap 50 XLM for USDC using Soroswap</p>
                     </Card>
                     <Card 
                       className="p-4 bg-retro pixel-border hover:bg-green-900/30 cursor-pointer transition-colors"
-                      onClick={() => setInput("Swap 1000 USDC to XLM with best rates")}
+                      onClick={() => setInput("Add liquidity to the XLM/USDC pool on Soroswap")}
                     >
-                      <p className="text-sm neon">⚡ Execute optimized swaps</p>
+                      <p className="text-sm neon">💧 Add liquidity to the XLM/USDC pool on Soroswap</p>
                     </Card>
                     <Card 
                       className="p-4 bg-retro pixel-border hover:bg-green-900/30 cursor-pointer transition-colors"
-                      onClick={() => setInput("Create a DeFindex vault for automated yield")}
+                      onClick={() => setInput("Show me my LP positions on Soroswap")}
                     >
-                      <p className="text-sm neon">🚀 Build automated strategies</p>
+                      <p className="text-sm neon">📊 Show me my LP positions on Soroswap</p>
                     </Card>
                   </div>
                 </div>
@@ -817,7 +817,7 @@ ${JSON.stringify(data.result, null, 2)}
                   <div className="rounded-2xl p-4 max-w-[80%] bg-gradient-to-r from-slate-800/60 to-slate-700/60 text-white border-2 border-purple-500/50 shadow-lg">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse"></div>
-                      <div className="text-sm font-bold neon">Transaction Ready - Review & Sign</div>
+                      <div className="text-sm font-bold neon">Transaction Ready for Signature</div>
                     </div>
                     {/* Show swap stats if Soroswap swap */}
                     {pendingGemini && pendingGemini.operations && pendingGemini.operations[0]?.protocol === 'Soroswap' && pendingGemini.operations[0]?.action === 'swap' && (
@@ -861,18 +861,18 @@ ${JSON.stringify(data.result, null, 2)}
                     
                     <div className="flex gap-2">
                         <Button
-                          onClick={handleSignAndSubmit} 
-                          disabled={signing || !connected} 
-                          className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0 font-bold"
-                        >
-                          {signing ? (
-                            <div className="flex items-center gap-2">
-                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                              Processing...
-                            </div>
-                          ) : (
-                            "✨ Sign & Execute Transaction"
-                          )}
+                        onClick={handleSignAndSubmit} 
+                        disabled={signing || !connected} 
+                        className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0 font-bold"
+                      >
+                        {signing ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            Signing...
+                          </div>
+                        ) : (
+                          "✍️ Sign & Submit Transaction"
+                        )}
                         </Button>
                         <Button
                         onClick={() => {

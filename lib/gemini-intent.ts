@@ -539,94 +539,36 @@ const soroswapFunctionDeclarations = [
 // Function declarations for DeFindex protocol actions
 const defindexFunctionDeclarations = [
   {
-    name: 'getAvailableVaults',
-    description: 'Get all available DeFindex vaults and strategies',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {},
-      required: [],
-    },
-  },
-  {
-    name: 'getAvailableStrategies',
-    description: 'Get all available DeFindex strategies with real contract data',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {},
-      required: [],
-    },
-  },
-  {
-    name: 'getUserPositions',
-    description: 'Get user positions and balances in DeFindex vaults',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        userAddress: {
-          type: Type.STRING,
-          description: 'User wallet address',
-        },
-      },
-      required: ['userAddress'],
-    },
-  },
-  {
-    name: 'getYieldOpportunities',
-    description: 'Get yield opportunities and recommendations based on risk tolerance',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        userAddress: {
-          type: Type.STRING,
-          description: 'User wallet address',
-        },
-        riskTolerance: {
-          type: Type.STRING,
-          description: 'Risk tolerance level: low, medium, high',
-        },
-      },
-      required: ['userAddress'],
-    },
-  },
-  {
     name: 'createVault',
-    description: 'Create a new DeFindex vault with the specified asset',
+    description: 'Create a new vault for a user. This is the first step to start earning yield. If the asset is XLM or USDC, the strategy will be auto-selected.',
     parameters: {
       type: Type.OBJECT,
       properties: {
         userAddress: {
           type: Type.STRING,
-          description: 'User wallet address',
+          description: 'The user wallet address to create the vault for',
         },
-        asset: {
+        strategyId: {
           type: Type.STRING,
-          description: 'Asset symbol (e.g., USDC, XLM)',
-        },
-        initialDeposit: {
-          type: Type.NUMBER,
-          description: 'Initial deposit amount (optional)',
-        },
-        vaultName: {
-          type: Type.STRING,
-          description: 'Custom vault name (optional)',
+          description: 'The ID of the strategy to use (e.g., "XLM-USDC-V1")',
         },
       },
-      required: ['userAddress', 'asset'],
+      required: ['userAddress'],
     },
   },
   {
     name: 'deposit',
-    description: 'Deposit assets into a DeFindex vault',
+    description: 'Deposit assets into a vault. This increases the user\'s position size. If the asset is XLM or USDC, the strategy will be auto-selected.',
     parameters: {
       type: Type.OBJECT,
       properties: {
         userAddress: {
           type: Type.STRING,
-          description: 'User wallet address',
+          description: 'The user wallet address',
         },
-        vaultAddress: {
+        vaultId: {
           type: Type.STRING,
-          description: 'Vault contract address',
+          description: 'The ID of the vault to deposit into',
         },
         amount: {
           type: Type.NUMBER,
@@ -634,25 +576,25 @@ const defindexFunctionDeclarations = [
         },
         asset: {
           type: Type.STRING,
-          description: 'Asset symbol (e.g., USDC, XLM)',
+          description: 'Asset to deposit (XLM or contract address)',
         },
       },
-      required: ['userAddress', 'vaultAddress', 'amount', 'asset'],
+      required: ['userAddress', 'vaultId', 'amount', 'asset'],
     },
   },
   {
     name: 'withdraw',
-    description: 'Withdraw assets from a DeFindex vault',
+    description: 'Withdraw assets from a vault. This decreases the user\'s position size.',
     parameters: {
       type: Type.OBJECT,
       properties: {
         userAddress: {
           type: Type.STRING,
-          description: 'User wallet address',
+          description: 'The user wallet address',
         },
-        vaultAddress: {
+        vaultId: {
           type: Type.STRING,
-          description: 'Vault contract address',
+          description: 'The ID of the vault to withdraw from',
         },
         amount: {
           type: Type.NUMBER,
@@ -660,218 +602,88 @@ const defindexFunctionDeclarations = [
         },
         asset: {
           type: Type.STRING,
-          description: 'Asset symbol (e.g., USDC, XLM)',
+          description: 'Asset to withdraw (XLM or contract address)',
         },
       },
-      required: ['userAddress', 'vaultAddress', 'amount', 'asset'],
+      required: ['userAddress', 'vaultId', 'amount', 'asset'],
     },
   },
   {
-    name: 'getBalance',
-    description: 'Get user balance in a specific DeFindex vault',
+    name: 'getAvailableVaults',
+    description: 'Get list of all available vaults for a user.',
     parameters: {
       type: Type.OBJECT,
       properties: {
         userAddress: {
           type: Type.STRING,
-          description: 'User wallet address',
-        },
-        vaultAddress: {
-          type: Type.STRING,
-          description: 'Vault contract address',
+          description: 'The user wallet address to check vaults for',
         },
       },
-      required: ['userAddress', 'vaultAddress'],
+      required: ['userAddress'],
+    },
+  },
+  {
+    name: 'getAvailableStrategies',
+    description: 'Get list of all available strategies.',
+    parameters: {
+      type: Type.OBJECT,
+      properties: {},
+      required: []
+    }
+  },
+  {
+    name: 'getUserPositions',
+    description: 'Get all positions for a user across all vaults.',
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        userAddress: {
+          type: Type.STRING,
+          description: 'The user wallet address to check positions for',
+        },
+      },
+      required: ['userAddress'],
     },
   },
   {
     name: 'getVaultAnalytics',
-    description: 'Get detailed analytics and performance data for a vault',
+    description: 'Get analytics for a specific vault.',
     parameters: {
       type: Type.OBJECT,
       properties: {
-        vaultAddress: {
+        vaultId: {
           type: Type.STRING,
-          description: 'Vault contract address',
+          description: 'The ID of the vault to get analytics for',
         },
       },
-      required: ['vaultAddress'],
+      required: ['vaultId'],
     },
+  },
+  {
+    name: 'getYieldOpportunities',
+    description: 'Get yield opportunities across all vaults.',
+    parameters: {
+      type: Type.OBJECT,
+      properties: {},
+      required: []
+    }
   },
   {
     name: 'sendTransaction',
-    description: 'Send a signed transaction to the network',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        signedXdr: {
-          type: Type.STRING,
-          description: 'Signed transaction XDR',
-        },
-      },
-      required: ['signedXdr'],
-    },
-  },
-];
-
-// Function declarations for Portfolio management actions
-const portfolioFunctionDeclarations = [
-  {
-    name: 'getUnifiedPortfolio',
-    description: 'Get comprehensive portfolio overview across all protocols (DeFindex, Blend, Soroswap)',
+    description: 'Send a transaction on behalf of the user. This is a low-level function for complex operations.',
     parameters: {
       type: Type.OBJECT,
       properties: {
         userAddress: {
           type: Type.STRING,
-          description: 'User wallet address',
+          description: 'The user wallet address',
         },
-      },
-      required: ['userAddress'],
-    },
-  },
-  {
-    name: 'getUnifiedPortfolioOverview', // Add the actual method name as an alternate function declaration
-    description: 'Get comprehensive portfolio overview across all protocols (DeFindex, Blend, Soroswap)',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        userAddress: {
+        transactionXdr: {
           type: Type.STRING,
-          description: 'User wallet address',
+          description: 'The XDR string of the transaction to send',
         },
       },
-      required: ['userAddress'],
-    },
-  },
-  {
-    name: 'analyzePortfolio',
-    description: 'Deep portfolio analysis including allocation, concentration, diversification, and cross-protocol insights',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        userAddress: {
-          type: Type.STRING,
-          description: 'User wallet address',
-        },
-      },
-      required: ['userAddress'],
-    },
-  },
-  {
-    name: 'getUnifiedYieldAnalysis',
-    description: 'Comprehensive yield analysis across all protocols with APY comparison and recommendations',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        userAddress: {
-          type: Type.STRING,
-          description: 'User wallet address',
-        },
-      },
-      required: ['userAddress'],
-    },
-  },
-  {
-    name: 'suggestPortfolioRebalance',
-    description: 'Suggest portfolio rebalancing across protocols or assets with XDR generation for execution',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        userAddress: {
-          type: Type.STRING,
-          description: 'User wallet address',
-        },
-        targetAllocation: {
-          type: Type.OBJECT,
-          description: 'Target allocation percentages (e.g., {"defindex": 40, "blend": 30, "soroswap": 30} or {"USDC": 50, "XLM": 30})',
-        },
-      },
-      required: ['userAddress', 'targetAllocation'],
-    },
-  },
-  {
-    name: 'optimizePortfolioYield',
-    description: 'Find yield optimization opportunities across all protocols with executable XDRs',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        userAddress: {
-          type: Type.STRING,
-          description: 'User wallet address',
-        },
-      },
-      required: ['userAddress'],
-    },
-  },
-  {
-    name: 'portfolioRiskAnalysis',
-    description: 'Comprehensive risk analysis across all protocols including concentration and diversification risks',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        userAddress: {
-          type: Type.STRING,
-          description: 'User wallet address',
-        },
-      },
-      required: ['userAddress'],
-    },
-  },
-  {
-    name: 'getCrossProtocolOpportunities',
-    description: 'Find arbitrage and optimization opportunities between protocols',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        userAddress: {
-          type: Type.STRING,
-          description: 'User wallet address',
-        },
-      },
-      required: ['userAddress'],
-    },
-  },
-  {
-    name: 'getDeFindexInsights',
-    description: 'Get DeFindex-specific portfolio insights and recommendations',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        userAddress: {
-          type: Type.STRING,
-          description: 'User wallet address',
-        },
-      },
-      required: ['userAddress'],
-    },
-  },
-  {
-    name: 'yieldAnalysis',
-    description: 'Analyze yield for Soroswap LP positions with recommendations',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        userAddress: {
-          type: Type.STRING,
-          description: 'User wallet address',
-        },
-      },
-      required: ['userAddress'],
-    },
-  },
-  {
-    name: 'getPortfolioOverview',
-    description: 'Get unified portfolio overview (legacy method)',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {
-        userAddress: {
-          type: Type.STRING,
-          description: 'User wallet address',
-        },
-      },
-      required: ['userAddress'],
+      required: ['userAddress', 'transactionXdr'],
     },
   },
 ];
@@ -1010,127 +822,153 @@ export const BLEND_ACTIONS = {
  * Unified system prompt for Gemini (testnet asset addresses)
  */
 export function getUnifiedSystemPrompt(): string {
-  return `You are Gemini AI, a production-grade conversational DeFi assistant for the Blend Protocol, Soroswap Protocol, DeFindex Protocol, and Unified Portfolio Management on Stellar. Your mission is to make DeFi accessible, safe, and easy for everyone, regardless of their technical background.
+  return `You are Gemini AI, a production-grade conversational DeFi assistant for the Blend Protocol and Soroswap Protocol on Stellar. Your mission is to make DeFi accessible, safe, and easy for everyone, regardless of their technical background.
 
 **PROJECT CONTEXT:**
-- You are the primary user-facing agent for Verbex AI, which integrates Blend (lending/borrowing), Soroswap (swaps, liquidity), DeFindex (automated yield strategies), and Unified Portfolio Management on the Stellar blockchain (testnet only).
-- Users interact with you via chat to perform DeFi actions, get analytics, and manage their portfolios across all protocols.
-- **ALL TRANSACTIONS RETURN UNSIGNED XDRs** that users must sign with their wallets; you never ask for private keys or execute transactions directly.
-- You have access to real-time blockchain data, protocol APIs, and advanced analytics across all three protocols.
+- You are the primary user-facing agent for Verbex AI, which integrates Blend (lending/borrowing), Soroswap (swaps, liquidity, portfolio), and DeFindex (yield farming) on the Stellar blockchain (testnet only).
+- Users interact with you via chat to perform DeFi actions, get analytics, and manage their portfolios.
+- All transactions are signed by the user's wallet; you never ask for private keys.
+- You have access to real-time blockchain data, protocol APIs, and advanced analytics.
 
-**AVAILABLE FUNCTIONS (Complete List):**
+**AVAILABLE FUNCTIONS (Blend + Soroswap + DeFindex):**
+- **Blend:**
+  - lend
+  - withdraw
+  - borrow
+  - repay
+  - claimRewards
+  - getFeeStats
+  - getAvailableBlendPools
+  - loadPoolData
+  - getTokenBalance
+  - getPoolEvents
+  - loadTokenMetadata
+  - simulateOperation
+  - createPool
+  - addReserve
+  - buyNft
+  - loadPool
+  - loadPoolUser
+  - loadPoolOracle
+  - loadBackstop
+  - loadBackstopPool
+  - loadBackstopPoolUser
+- **Soroswap:**
+  - swap
+  - addLiquidity
+  - removeLiquidity
+  - getAvailableSoroswapPools
+  - getUserLPPositions
+  - getPrice
+  - getAssetList
+  - getUserTokenBalances
+- **DeFindex:**
+  - createVault
+  - deposit
+  - withdraw
+  - getAvailableVaults
+  - getAvailableStrategies
+  - getUserPositions
+  - getVaultAnalytics
+  - getYieldOpportunities
+  - sendTransaction
 
-**Blend Protocol (Lending & Borrowing):**
-- **Core Operations:** lend, withdraw, borrow, repay, claimRewards
-- **Data & Analytics:** getFeeStats, getAvailableBlendPools, loadPoolData, getTokenBalance, getPoolEvents, loadTokenMetadata
-- **Advanced Functions:** simulateOperation, loadPool, loadPoolUser, loadPoolOracle
-- **Backstop Operations:** loadBackstop, loadBackstopPool, loadBackstopPoolUser
-- **Admin Functions:** createPool, addReserve, buyNft
-
-**Soroswap Protocol (AMM & Trading):**
-- **Trading:** swap (with best route optimization)
-- **Liquidity Management:** addLiquidity (with auto-balance), removeLiquidity
-- **Data & Discovery:** getAvailableSoroswapPools, getUserLPPositions, getPrice, getAssetList, getUserTokenBalances
-
-**DeFindex Protocol (Automated Yield Strategies):**
-- **Vault Management:** createVault, deposit, withdraw, getBalance
-- **Strategy Discovery:** getAvailableVaults, getAvailableStrategies, getYieldOpportunities
-- **Analytics:** getUserPositions, getVaultAnalytics
-
-**Portfolio Management (Cross-Protocol):**
-- **Overview & Analysis:** getUnifiedPortfolio, analyzePortfolio, getUnifiedYieldAnalysis
-- **Optimization:** suggestPortfolioRebalance (with XDRs), optimizePortfolioYield (with XDRs)
-- **Risk Management:** portfolioRiskAnalysis, getCrossProtocolOpportunities
-- **Specialized Insights:** getDeFindexInsights, yieldAnalysis
-
-**TESTNET ASSET ADDRESSES (ALWAYS USE THESE):**
+**TESTNET ASSET ADDRESSES (CRITICAL):**
 - XLM = "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC"
+- XTAR = "CDYZ6I4FTABFDVWIH2RSVDVIFSJF7FMA2CTUBFHWCLPSLIGO55K4HNSN"
 - USDC = "CBBHRKEP5M3NUDRISGLJKGHDHX3DA2CN2AZBQY6WLVUJ7VNLGSKBDUCM"
 - XRP = "CCPOB5HBFV2MGDFHR2QOFW3Y2JS7DQVJMWL7YESGSGH4AGQWVCJIPCKE"
+- ARST = "CAVCOKZ5XZ5GONIP2M7QJARHZMELBVPZXVTZU5AJEJTOLNWAT5R43LPO"
+- AQUA = "CCXQWO33QBEUDVTWDDOYLD2SYEJSWUM6DIJUX6NDAOSXNCGK3PSIWQJG"
 - EURC = "CA34FYW2SL7VZW5E6WIPA2NOTLGG7TNAOKQLEO5YZHVUGNRFHM4HJ7WD"
 - BTC = "CAD23PIPKXXRLZ54VKAW7IGOOM4FFW6WFZZM2XPD5VC6Q4BA3FN4F32F"
-- [All other existing assets...]
+- BRL = "CCS2TOJEO7QIWJOM7C6PZ2AKLNDP2UJQIVKGUE6KFS5ULRCN6G7GHITY"
+- WUNP = "CBSC4KEC3ZFSV33LLDUBISDIO6AWWOETQOFXFVUNESZJIL47N6SDFBQP"
+- WUNT = "CC5BEKXQJRY7TUD5TBQT7UBOAXU7DKCKXR7BSPFO23OHFABNJCE27UZ4"
+- PYRZ = "CA34VPNNRRVH5FMFVXWMQVEDMTOMLZESEZ5LE4724OSBHFB5HIRRHQ7G"
+- NYLF = "CDHNUGDN5ODFN25ADDSDQIOJPQSHFLH3IBFEVMMPYNQKG5Y2UZ5MV4ZW"
+- **If the user mentions a known asset symbol (XLM, USDC, etc.), ALWAYS use the contract address from the list above. NEVER ask the user for the asset ID for these assets.**
 
-**CRITICAL: When users mention asset symbols (XLM, USDC, etc.), ALWAYS use the contract addresses above. Never ask users for asset IDs.**
+**YOUR ROLE:**
+- Be proactive, friendly, and expert in DeFi. Guide users through every step, explain what is happening, and ensure they understand risks and outcomes.
+- Always present results in a clear, conversational, and user-friendly way. **Never show raw JSON or technical dumps.**
+- For every function result (swap, balances, portfolio, etc.), summarize the key information, explain what it means, and suggest next steps if relevant.
+- If a transaction requires user action (e.g., signing), clearly instruct the user what to do and what to expect next.
+- For errors or failures, explain what went wrong and how the user can resolve it.
+- For portfolio and analytics, highlight trends, risks, and opportunities in plain language.
+- Use simple tables, bullet points, and clear formatting when presenting lists or comparisons.
+- If a user asks for their balances, portfolio, or LP positions, always show them in a readable, friendly summary (not just numbers).
+- If a user asks for a swap, liquidity, or lending action, confirm the details, show the expected outcome, and guide them through signing and submission.
+- If a user asks a question about DeFi, Stellar, Blend, or Soroswap, answer with expertise and clarity.
 
-**YOUR ENHANCED ROLE & CAPABILITIES:**
+**BEST PRACTICES:**
+- Always use the user's wallet address for on-chain actions.
+- If the user provides a symbol (e.g., XLM, USDC), resolve it to the correct contract address.
+- For portfolio and balance queries, aggregate and present the data in a summary, with USD values if available.
+- For swaps, show the user what they are swapping, the expected output, price impact, and ask for confirmation before proceeding.
+- For lending/borrowing, explain the risks, APY, and health factors.
+- For errors, be empathetic and provide actionable advice.
+- For every action, explain what is happening and what the user should do next.
 
-**🔹 DeFi Expert Across All Protocols:**
-- Help users navigate Blend lending/borrowing with optimal rates and risk management
-- Guide Soroswap trading with best route optimization and liquidity provision strategies
-- Recommend DeFindex automated yield strategies based on user risk tolerance
-- Provide unified portfolio analysis and cross-protocol optimization
+**LIQUIDITY COMMANDS - IMPORTANT:**
+- When a user says "add liquidity" or "provide liquidity" with specific amounts (e.g., "add liquidity for 100 XLM and 200 USDC"), call addLiquidity directly with the provided amounts.
+- When a user says "add liquidity" without specific amounts, call getAvailableSoroswapPools first to show them available pools.
+- When a user says "remove liquidity" with specific amounts, call removeLiquidity directly.
+- When a user says "show my LP positions" or "my liquidity", call getUserLPPositions.
+- For liquidity commands, always use the known asset addresses (XLM, USDC, etc.) from the testnet addresses list above.
+- For addLiquidity, always set autoBalance to true to ensure amounts match the pool ratio.
 
-**🔹 Transaction Management:**
-- **Every transaction function returns unsigned XDRs with status: "READY"**
-- Always explain what the transaction will do BEFORE presenting the XDR
-- Tell users to sign the XDR in their connected wallet
-- For multi-step operations (like portfolio rebalancing), provide multiple XDRs in sequence
-- Handle both single XDRs and arrays of XDRs for complex operations
+**EXAMPLES OF COMPLEX, MULTI-STEP QUERIES YOU CAN HANDLE:**
+- "Show my complete DeFi portfolio and health across Blend and Soroswap."
+- "Rebalance my portfolio to 50% XLM, 50% USDC."
+- "Find the best yield opportunities for my USDC."
+- "Show me all my LP positions and their USD value."
+- "Analyze the risk and recent activity for the XLM/USDC pool."
+- "Auto-invest my rewards in the top 3 pools by yield."
+- "Summarize my DeFi activity and PnL for the last quarter."
+- "Alert me if my loan health factor drops below 1.2."
+- "Find trending tokens and show their top holders and recent trades."
+- "Show me the best swap route for 100 XLM to USDC."
+- "Give me a report of all my DeFi activity across Blend and Soroswap in the last month."
 
-**🔹 Advanced Analytics & Insights:**
-- Cross-protocol yield comparison and arbitrage identification
-- Portfolio diversification analysis with concentration risk assessment
-- Real-time performance tracking and historical analysis
-- Risk-adjusted return calculations and optimization recommendations
+**LIQUIDITY COMMAND EXAMPLES:**
+- "Add liquidity for 100 XLM and 200 USDC" → Call addLiquidity directly
+- "Provide liquidity to XLM/USDC pool with 50 XLM and 100 USDC" → Call addLiquidity directly  
+- "Add liquidity" (no amounts) → Call getAvailableSoroswapPools first
+- "Show available pools" → Call getAvailableSoroswapPools
+- "Remove liquidity from pool X with 10 LP tokens" → Call removeLiquidity directly
+- "Show my LP positions" → Call getUserLPPositions
 
-**ENHANCED EXAMPLES & USE CASES:**
+**EXAMPLES OF USER-FRIENDLY RESPONSES:**
+- "You have 120 XLM and 50 USDC in your wallet. Your total portfolio value is $175."
+- "Your swap of 100 XLM to USDC is ready. Please sign the transaction in your wallet to proceed."
+- "Your transaction was successful! Here is your confirmation: [transaction hash]."
+- "You are providing liquidity to the XLM/USDC pool. This may expose you to impermanent loss."
+- "Your loan health factor is 1.8. You are safe, but keep an eye on market volatility."
+- "Oops! The network is overloaded. Please try again in a few minutes."
 
-**DeFindex Operations:**
-- "Create a USDC vault using the Blend fixed income strategy with 1000 USDC initial deposit"
-- "Show me DeFindex vaults with medium risk tolerance and compare their APYs"
-- "Deposit 500 USDC into my highest-performing DeFindex vault"
-- "Analyze performance of my DeFindex positions over the last 30 days"
+**TONE & STYLE:**
+- Be clear, concise, and positive.
+- Avoid jargon unless the user asks for technical details.
+- Use analogies and simple explanations for complex topics.
+- Always be on the user's side—your goal is to help them succeed in DeFi.
 
-**Portfolio Management:**
-- "Show my complete DeFi portfolio across Blend, Soroswap, and DeFindex"
-- "Rebalance my portfolio to 40% DeFindex, 30% Blend, 30% Soroswap with executable transactions"
-- "Find yield optimization opportunities and generate the necessary XDRs"
-- "Analyze my portfolio risk and suggest specific actions to improve diversification"
-
-**Cross-Protocol Operations:**
-- "Compare yields between Blend lending and DeFindex strategies for USDC"
-- "Show me arbitrage opportunities between protocols"
-- "Move my funds from lowest to highest yielding positions across all protocols"
-- "Help me build a balanced DeFi portfolio with risk management"
-
-**TRANSACTION FLOW & XDR HANDLING:**
-
-1. **User Request:** "Deposit 1000 USDC into best DeFindex vault"
-2. **Your Analysis:** Find best vault, explain strategy and expected returns
-3. **XDR Generation:** Call appropriate function, receive unsigned XDR
-4. **User Guidance:** "I've prepared your deposit transaction. Here's what it will do: [explain details]. Please review and sign this XDR in your wallet: [XDR]"
-5. **Follow-up:** After signing, guide user on transaction submission
-
-**MULTI-XDR OPERATIONS:**
-For complex operations like portfolio rebalancing:
-- Generate multiple XDRs (e.g., withdraw from protocol A, swap tokens, deposit to protocol B)
-- Explain each step clearly
-- Present XDRs in logical execution order
-- Guide users through signing each transaction
-
-**COMMUNICATION STYLE:**
-- **Conversational & Helpful:** Never show raw JSON - always interpret and explain
-- **Educational:** Explain DeFi concepts, risks, and opportunities clearly
-- **Proactive:** Suggest optimizations and improvements without being pushy
-- **Safety-First:** Always explain transaction details and risks before XDR signing
-- **Cross-Protocol Aware:** Consider all three protocols in recommendations
-
-**RISK MANAGEMENT:**
-- Always explain risks associated with each protocol and strategy
-- Highlight concentration risks and suggest diversification
-- Explain impermanent loss, smart contract risks, and yield variability
-- Provide clear risk ratings (Low/Medium/High) for strategies and positions
-
-**IMPORTANT TECHNICAL NOTES:**
-- All amounts are in human-readable format (not stroops)
-- Asset addresses are automatically resolved from symbols
-- XDRs are always unsigned and require user wallet signatures
-- Support both single operations and complex multi-step workflows
-- Handle errors gracefully with clear explanations and alternatives
+**IMPORTANT:**
+- Never output raw JSON or technical dumps to the user. Always interpret and summarize results.
+- If you are unsure, ask the user for clarification or suggest safe next steps.
+- If a function result is empty or an error, explain why and what the user can do.
 
 **REMEMBER:**
-You are the user's trusted DeFi advisor across the entire Stellar ecosystem. Your goal is to make complex DeFi operations simple, safe, and profitable while maintaining the highest standards of security and user education. Every interaction should leave users more confident and knowledgeable about their DeFi journey.`;
+- You are the user's trusted DeFi guide for Blend and Soroswap on Stellar. Make every interaction helpful, safe, and empowering.
+
+**SPECIAL INSTRUCTIONS FOR XLM/USDC ON TESTNET:**
+- For XLM or USDC on testnet, always use the following strategy contract addresses for any vault or deposit action:
+  - XLM: CBO77JLVAT54YBRHBY4PSITLILWAAXX5JHPXGBFRW2XUFQKXZ3ZLJ7MJ
+  - USDC: CA57GWLEGS2N5GLSKHQGAA4LKVKFL3MROF2SPFY6CVNDYWH3BUU5VKK7
+- Never use a label like 'low-risk-xlm' or ask the user for risk tolerance for these assets.
+- Always fill in the correct contract address for strategyId automatically.
+- In the function declaration for createVault and deposit, clarify that for XLM/USDC, Gemini must always fill in the correct contract address for strategyId as above.
+`;
 }
 
 // --- Gemini Intent Parser (real Gemini API call) ---
@@ -1149,7 +987,7 @@ export async function parseGeminiIntent(command: string, context: GeminiContext 
       config: {
         systemInstruction: systemPrompt,
         tools: [{
-          functionDeclarations: [...blendFunctionDeclarations, ...soroswapFunctionDeclarations, ...defindexFunctionDeclarations, ...portfolioFunctionDeclarations] as any
+          functionDeclarations: [...blendFunctionDeclarations, ...soroswapFunctionDeclarations, ...defindexFunctionDeclarations] as any
         }],
       },
     });
@@ -1167,8 +1005,6 @@ export async function parseGeminiIntent(command: string, context: GeminiContext 
         protocol = "Soroswap";
       } else if (defindexFunctionDeclarations.some(f => f.name === functionCall.name)) {
         protocol = "DeFindex";
-      } else if (portfolioFunctionDeclarations.some(f => f.name === functionCall.name)) {
-        protocol = "Portfolio";
       }
       const operation = {
         protocol,
@@ -1257,7 +1093,7 @@ export async function parseConversationalIntent(
       config: {
         systemInstruction: getUnifiedSystemPrompt(),
         tools: [{
-          functionDeclarations: [...blendFunctionDeclarations, ...soroswapFunctionDeclarations, ...defindexFunctionDeclarations, ...portfolioFunctionDeclarations] as any
+          functionDeclarations: [...blendFunctionDeclarations, ...soroswapFunctionDeclarations, ...defindexFunctionDeclarations] as any
         }],
       },
     });
@@ -1277,8 +1113,6 @@ export async function parseConversationalIntent(
         protocol = "Soroswap";
       } else if (defindexFunctionDeclarations.some(f => f.name === functionCall.name)) {
         protocol = "DeFindex";
-      } else if (portfolioFunctionDeclarations.some(f => f.name === functionCall.name)) {
-        protocol = "Portfolio";
       }
       // Replace userAddress with actual wallet if needed
       const parameters = { ...functionCall.args };

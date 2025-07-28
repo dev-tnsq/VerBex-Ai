@@ -826,12 +826,7 @@ export class DeFindexService {
     
     try {
       // Get strategy information
-      const strategies = await this.getAvailableStrategies();
-      const strategy = strategies.strategies?.find((s: any) => s.id === strategyId);
-      
-      if (!strategy) {
-        throw new Error(`Strategy ${strategyId} not found`);
-      }
+     
 
       const assetAddress = this.getAssetAddress(asset);
       const vaultNameFormatted = vaultName || `${asset} Vault`;
@@ -852,7 +847,7 @@ export class DeFindexService {
         vault_fee_bps: 1000, // 10% fee in basis points
         assets: [{
           asset: assetAddress,
-          strategy: strategy.address
+          strategy:strategyId
         }],
         name_symbol: {
           name: vaultNameFormatted,
@@ -887,17 +882,15 @@ export class DeFindexService {
       return {
         status: "READY",
         xdr,
-        message: `Create ${asset} vault using ${strategy.name} strategy`,
+        message: `Create ${asset} vault using ${strategyId} strategy`,
         details: {
           action: "create_vault",
           strategyId,
-          strategyName: strategy.name,
+
           asset,
           assetAddress,
           initialDeposit,
           vaultName: vaultNameFormatted,
-          estimatedAPY: strategy.currentAPY,
-          riskLevel: strategy.riskLevel,
           responseData: response.data
         }
       };

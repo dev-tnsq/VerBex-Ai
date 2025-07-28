@@ -3,7 +3,6 @@ import { parseConversationalIntent, formatResultWithGemini } from '@/lib/gemini-
 import { BlendService } from '../../../Mcp/src/services/blend.service';
 import { SoroswapService } from '../../../Mcp/src/services/soroswap.service';
 import { DeFindexService } from '../../../Mcp/src/services/defindex.service';
-import { UnifiedPortfolioService } from '../../../Mcp/src/services/portfolio.service';
 import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
@@ -25,20 +24,6 @@ const ASSET_ADDRESSES: Record<string, string> = {
   'NYLF': 'CDHNUGDN5ODFN25ADDSDQIOJPQSHFLH3IBFEVMMPYNQKG5Y2UZ5MV4ZW',
 };
 
-// DeFindex strategy mapping for assets
-const DEFINDEX_STRATEGIES: Record<string, string> = {
-  'XLM': 'CBO77JLVAT54YBRHBY4PSITLILWAAXX5JHPXGBFRW2XUFQKXZ3ZLJ7MJ', // XLM Blend Fixed Income Strategy
-  'USDC': 'CA57GWLEGS2N5GLSKHQGAA4LKVKFL3MROF2SPFY6CVNDYWH3BUU5VKK7', // USDC Blend Fixed Income Strategy
-};
-
-// DeFindex specific asset addresses (different from general ASSET_ADDRESSES)
-const DEFINDEX_ASSET_ADDRESSES: Record<string, string> = {
-  'XLM': 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC',
-  'USDC': 'CAQCFVLOBK5GIULPNZRGATJJMIZL5BSP7X5YJVMGCPTUEPFM4AVSRCJU',
-  'BLND': 'CB22KRA3YZVCNCQI64JQ5WE7UY2VAV7WFLK6A2JN3HEX56T2EDAFO7QF'
-};
- 
-
 // Helper function to convert asset symbols to addresses
 function resolveAssetAddress(asset: string): string {
   // If it's already a contract address (starts with C and 56 chars), return as-is
@@ -54,24 +39,9 @@ function resolveAssetAddress(asset: string): string {
   return asset;
 }
 
-// Helper function specifically for DeFindex asset addresses
-function resolveDefindexAssetAddress(asset: string): string {
-  // If it's already a contract address (starts with C and 56 chars), return as-is
-  if (asset.startsWith('C') && asset.length === 56) {
-    return asset;
-  }
-  // If it's a symbol, convert to DeFindex-specific address
-  const address = DEFINDEX_ASSET_ADDRESSES[asset.toUpperCase()];
-  if (address) {
-    return address;
-  }
-  // Fall back to general asset addresses
-  const generalAddress = ASSET_ADDRESSES[asset.toUpperCase()];
-  if (generalAddress) {
-    return generalAddress;
-  }
-  // If not found in either mapping, return original
-  return asset;
+// Helper to check if a string is a contract address
+function isContractAddress(str: string) {
+  return typeof str === 'string' && str.length === 56 && str.startsWith('C');
 }
 
 export async function POST(req: NextRequest) {
@@ -302,7 +272,7 @@ export async function POST(req: NextRequest) {
             getAvailableSoroswapPools: soroswap.getAvailableSoroswapPools.bind(soroswap),
             getUserLPPositions: soroswap.getUserLPPositions.bind(soroswap),
             getPrice: (params: any) => {
-              if (params.asset) params.asset = ASSET_ADDRESSES[params.asset] || resolveAssetAddress(params.asset);
+              if (params.asset) params.asset = resolveAssetAddress(params.asset);
               return soroswap.getPrice(params);
             },
             getAssetList: soroswap.getAssetList.bind(soroswap),
@@ -330,35 +300,42 @@ export async function POST(req: NextRequest) {
           result = { error: e.message || 'Soroswap error', stack: e.stack };
         }
       } else if (op.protocol === 'DeFindex') {
+        // Fallback logic for createVault
+        if (op.action === 'createVault') {
+          const XLM_STRATEGY = 'CBO77JLVAT54YBRHBY4PSITLILWAAXX5JHPXGBFRW2XUFQKXZ3ZLJ7MJ';
+          const USDC_STRATEGY = 'CA57GWLEGS2N5GLSKHQGAA4LKVKFL3MROF2SPFY6CVNDYWH3BUU5VKK7';
+          let { asset, strategyId, vaultName } = params;
+          if (!asset && strategyId) {
+            if (strategyId === XLM_STRATEGY) params.asset = 'XLM';
+            if (strategyId === USDC_STRATEGY) params.asset = 'USDC';
+          }
+          if (params.asset) {
+            const upper = params.asset.toUpperCase();
+            if ((upper === 'XLM' || upper === ASSET_ADDRESSES.XLM) && (!strategyId || !isContractAddress(strategyId))) {
+              params.strategyId = XLM_STRATEGY;
+            }
+            if ((upper === 'USDC' || upper === ASSET_ADDRESSES.USDC) && (!strategyId || !isContractAddress(strategyId))) {
+              params.strategyId = USDC_STRATEGY;
+            }
+            params.asset = ASSET_ADDRESSES[upper] || params.asset;
+          }
+          if (!params.vaultName && params.asset) {
+            params.vaultName = `${params.asset} Vault`;
+          }
+        }
         try {
           const defindex = new DeFindexService();
           const defindexActions: Record<string, (params: any) => Promise<any>> = {
             // Vault operations
-            createVault: (params: any) => {
-              console.log('[Protocol API] DeFindex createVault with params:', params);
-              
-              // Map asset to appropriate strategy if not provided
-              if (!params.strategyId && params.asset) {
-                const assetSymbol = params.asset.toUpperCase();
-                params.strategyId = DEFINDEX_STRATEGIES[assetSymbol];
-                console.log(`[Protocol API] Mapped ${assetSymbol} to strategy ${params.strategyId}`);
-              }
-              
-              if (!params.strategyId) {
-                return Promise.resolve({ status: 'ERROR', message: 'No suitable strategy found for the asset' });
-              }
-              
-              if (params.asset) params.asset = resolveDefindexAssetAddress(params.asset);
-              return defindex.createVault(params);
-            },
             deposit: (params: any) => {
-              if (params.asset) params.asset = resolveDefindexAssetAddress(params.asset);
+              if (params.asset) params.asset = resolveAssetAddress(params.asset);
               return defindex.deposit(params);
             },
             withdraw: (params: any) => {
-              if (params.asset) params.asset = resolveDefindexAssetAddress(params.asset);
+              if (params.asset) params.asset = resolveAssetAddress(params.asset);
               return defindex.withdraw(params);
             },
+            createVault: defindex.createVault.bind(defindex),
             
             // Query operations
             getBalance: defindex.getBalance.bind(defindex),
@@ -374,17 +351,9 @@ export async function POST(req: NextRequest) {
           const fn = defindexActions[op.action];
           if (fn) {
             const defindexResult = await fn(params);
-            // Handle DeFindex XDR responses properly
-            if (defindexResult && defindexResult.status === 'READY' && defindexResult.xdr) {
-              xdr = defindexResult.xdr;
-              summary = defindexResult.message || intent.confirmation_text;
-            } else if (defindexResult && defindexResult.xdr) {
-              xdr = defindexResult.xdr;
-              summary = defindexResult.message || intent.confirmation_text;
-            } else if (defindexResult && defindexResult.txHash) {
-              txHash = defindexResult.txHash;
-              summary = defindexResult.message || intent.confirmation_text;
-            }
+            if (defindexResult && defindexResult.xdr) xdr = defindexResult.xdr;
+            if (defindexResult && defindexResult.txHash) txHash = defindexResult.txHash;
+            if (defindexResult && defindexResult.summary) summary = defindexResult.summary;
             result = defindexResult;
             // --- Update dynamic context with new keys from result ---
             if (result && typeof result === 'object') {
@@ -399,58 +368,6 @@ export async function POST(req: NextRequest) {
           }
         } catch (e: any) {
           result = { error: e.message || 'DeFindex error', stack: e.stack };
-        }
-      } else if (op.protocol === 'Portfolio') {
-        try {
-          const portfolio = new UnifiedPortfolioService();
-          const portfolioActions: Record<string, (params: any) => Promise<any>> = {
-            // Portfolio management operations
-            getUnifiedPortfolio: portfolio.getUnifiedPortfolioOverview.bind(portfolio),
-            analyzePortfolio: portfolio.analyzePortfolio.bind(portfolio),
-            getUnifiedYieldAnalysis: portfolio.getUnifiedYieldAnalysis.bind(portfolio),
-            suggestPortfolioRebalance: (params: any) => portfolio.suggestRebalance(params.userAddress, params.targetAllocation),
-            optimizePortfolioYield: portfolio.optimizeYield.bind(portfolio),
-            portfolioRiskAnalysis: portfolio.riskAnalysis.bind(portfolio),
-            getCrossProtocolOpportunities: portfolio.getCrossProtocolOpportunities.bind(portfolio),
-            getDeFindexInsights: portfolio.getDeFindexInsights.bind(portfolio),
-          };
-          const fn = portfolioActions[op.action];
-          if (fn) {
-            const portfolioResult = await fn(params);
-            // Handle Portfolio XDR responses (multiple XDRs possible)
-            if (portfolioResult && portfolioResult.status === 'READY' && portfolioResult.xdrs) {
-              // Multiple XDRs from rebalancing or optimization
-              portfolioResult.xdrs.forEach((xdrItem: string) => {
-                if (xdrItem) xdrs.push(xdrItem);
-              });
-              summary = portfolioResult.message || intent.confirmation_text;
-            } else if (portfolioResult && portfolioResult.xdr) {
-              xdr = portfolioResult.xdr;
-              summary = portfolioResult.message || intent.confirmation_text;
-            } else if (portfolioResult && portfolioResult.xdrs && Array.isArray(portfolioResult.xdrs)) {
-              // Handle array of XDRs from portfolio operations
-              portfolioResult.xdrs.forEach((xdrItem: string) => {
-                if (xdrItem) xdrs.push(xdrItem);
-              });
-              summary = portfolioResult.message || `Portfolio operation ready: ${portfolioResult.xdrs.length} transactions`;
-            } else if (portfolioResult && portfolioResult.txHash) {
-              txHash = portfolioResult.txHash;
-              summary = portfolioResult.message || intent.confirmation_text;
-            }
-            result = portfolioResult;
-            // --- Update dynamic context with new keys from result ---
-            if (result && typeof result === 'object') {
-              for (const key of Object.keys(result)) {
-                if (result[key] !== undefined && result[key] !== null) {
-                  dynamicContext[key] = result[key];
-                }
-              }
-            }
-          } else {
-            result = { error: `UnifiedPortfolioService has no action '${op.action}'` };
-          }
-        } catch (e: any) {
-          result = { error: e.message || 'Portfolio error', stack: e.stack };
         }
       } else {
         result = { status: 'Unsupported protocol', op };
@@ -603,10 +520,6 @@ export async function POST(req: NextRequest) {
         // Map Gemini action name to DeFindexService method
         const defindexActions: Record<string, (params: any) => Promise<any>> = {
           // Vault operations
-          createVault: (params: any) => {
-            if (params.asset) params.asset = resolveAssetAddress(params.asset);
-            return defindex.createVault(params);
-          },
           deposit: (params: any) => {
             if (params.asset) params.asset = resolveAssetAddress(params.asset);
             return defindex.deposit(params);
@@ -615,6 +528,7 @@ export async function POST(req: NextRequest) {
             if (params.asset) params.asset = resolveAssetAddress(params.asset);
             return defindex.withdraw(params);
           },
+          createVault: defindex.createVault.bind(defindex),
           
           // Query operations
           getBalance: defindex.getBalance.bind(defindex),
@@ -671,7 +585,7 @@ export async function POST(req: NextRequest) {
           getAvailableSoroswapPools: soroswap.getAvailableSoroswapPools.bind(soroswap),
           getUserLPPositions: soroswap.getUserLPPositions.bind(soroswap),
           getPrice: (params: any) => {
-            if (params.asset) params.asset = ASSET_ADDRESSES[params.asset] || resolveAssetAddress(params.asset);
+            if (params.asset) params.asset = resolveAssetAddress(params.asset);
             return soroswap.getPrice(params);
           },
           getAssetList: soroswap.getAssetList.bind(soroswap),
@@ -700,131 +614,6 @@ export async function POST(req: NextRequest) {
         result = { error: e.message || 'Soroswap error', stack: e.stack };
       }
     }
-    // --- DeFindex Integration ---
-    else if (op.protocol === 'DeFindex') {
-      try {
-        const defindex = new DeFindexService();
-        // Map Gemini action name to DeFindexService method
-        const defindexActions: Record<string, (params: any) => Promise<any>> = {
-          // Vault operations
-          createVault: (params: any) => {
-            if (params.asset) params.asset = resolveAssetAddress(params.asset);
-            return defindex.createVault(params);
-          },
-          deposit: (params: any) => {
-            if (params.asset) params.asset = resolveAssetAddress(params.asset);
-            return defindex.deposit(params);
-          },
-          withdraw: (params: any) => {
-            if (params.asset) params.asset = resolveAssetAddress(params.asset);
-            return defindex.withdraw(params);
-          },
-          
-          // Query operations
-          getBalance: defindex.getBalance.bind(defindex),
-          getAvailableVaults: defindex.getAvailableVaults.bind(defindex),
-          getAvailableStrategies: defindex.getAvailableStrategies.bind(defindex),
-          getUserPositions: defindex.getUserPositions.bind(defindex),
-          getVaultAnalytics: defindex.getVaultAnalytics.bind(defindex),
-          getYieldOpportunities: defindex.getYieldOpportunities.bind(defindex),
-          
-          // Transaction operations
-          sendTransaction: defindex.sendTransaction.bind(defindex),
-        };
-        console.log('[Protocol API] DeFindex action requested:', op.action, op.parameters);
-        const fn = defindexActions[op.action];
-        if (fn) {
-          console.log('[Protocol API] About to call DeFindex function:', op.action, op.parameters);
-          const defindexResult = await fn(op.parameters);
-          console.log('[Protocol API] DeFindex function result:', defindexResult);
-          result = defindexResult;
-          if (defindexResult && defindexResult.xdr) xdr = defindexResult.xdr;
-          if (defindexResult && defindexResult.txHash) txHash = defindexResult.txHash;
-          if (defindexResult && defindexResult.summary) summary = defindexResult.summary;
-          // Always format the result for the user using Gemini
-          if (result && intent.operations?.length > 0) {
-            const formattedResponse = await formatResultWithGemini(command, result, userWallet);
-            intent.confirmation_text = formattedResponse;
-          }
-        } else {
-          console.error('[Protocol API] DeFindex action not found in mapping:', op.action);
-          result = { error: `DeFindexService has no action '${op.action}'` };
-        }
-      } catch (e: any) {
-        result = { error: e.message || 'DeFindex error', stack: e.stack };
-      }
-    }
-    // --- Portfolio Management Integration ---
-    else if (op.protocol === 'Portfolio') {
-      try {
-        console.log('[Protocol API] Creating UnifiedPortfolioService instance...');
-        const portfolio = new UnifiedPortfolioService();
-        console.log('[Protocol API] UnifiedPortfolioService instance created successfully');
-        
-        // Map Gemini action name to UnifiedPortfolioService method
-        const portfolioActions: Record<string, (params: any) => Promise<any>> = {
-          // Portfolio management operations
-          getUnifiedPortfolio: (params: any) => portfolio.getUnifiedPortfolioOverview(params.userAddress),
-          getUnifiedPortfolioOverview: (params: any) => portfolio.getUnifiedPortfolioOverview(params.userAddress), // Add this alias for direct method name
-          analyzePortfolio: (params: any) => portfolio.analyzePortfolio(params.userAddress),
-          getUnifiedYieldAnalysis: (params: any) => portfolio.getUnifiedYieldAnalysis(params.userAddress),
-          suggestPortfolioRebalance: (params: any) => portfolio.suggestRebalance(params.userAddress, params.targetAllocation),
-          optimizePortfolioYield: (params: any) => portfolio.optimizeYield(params.userAddress),
-          portfolioRiskAnalysis: (params: any) => portfolio.riskAnalysis(params.userAddress),
-          getCrossProtocolOpportunities: (params: any) => portfolio.getCrossProtocolOpportunities(params.userAddress),
-          getDeFindexInsights: (params: any) => portfolio.getDeFindexInsights(params.userAddress),
-        };
-        console.log('[Protocol API] Portfolio action requested:', op.action, op.parameters);
-        console.log('[Protocol API] Available portfolio actions:', Object.keys(portfolioActions));
-        
-        const fn = portfolioActions[op.action];
-        if (fn) {
-          console.log('[Protocol API] About to call Portfolio function:', op.action, op.parameters);
-          try {
-            const portfolioResult = await fn(op.parameters);
-            console.log('[Protocol API] Portfolio function executed successfully with result:', 
-              portfolioResult ? (typeof portfolioResult === 'object' ? JSON.stringify(portfolioResult).substring(0, 200) + '...' : 'Data received') : 'No data');
-            
-            result = portfolioResult;
-            if (portfolioResult && portfolioResult.xdr) {
-              xdr = portfolioResult.xdr;
-              console.log('[Protocol API] XDR received from portfolio function');
-            }
-            if (portfolioResult && portfolioResult.txHash) {
-              txHash = portfolioResult.txHash;
-              console.log('[Protocol API] Transaction hash received from portfolio function:', txHash);
-            }
-            if (portfolioResult && portfolioResult.summary) {
-              summary = portfolioResult.summary;
-              console.log('[Protocol API] Summary received from portfolio function');
-            }
-            
-            // Always format the result for the user using Gemini
-            if (result && intent.operations?.length > 0) {
-              console.log('[Protocol API] Formatting portfolio result with Gemini...');
-              const formattedResponse = await formatResultWithGemini(command, result, userWallet);
-              intent.confirmation_text = formattedResponse;
-              console.log('[Protocol API] Gemini formatting complete');
-            }
-          } catch (fnError:any) {
-            console.error('[Protocol API] Error executing Portfolio function:', op.action, fnError);
-            console.error('[Protocol API] Error stack:', fnError.stack);
-            result = { error: `Error executing ${op.action}: ${fnError.message}`, stack: fnError.stack };
-          }
-        } else {
-          console.error('[Protocol API] Portfolio action not found in mapping:', op.action);
-          console.error('[Protocol API] Available actions were:', Object.keys(portfolioActions));
-          result = { 
-            error: `UnifiedPortfolioService has no action '${op.action}'`,
-            availableActions: Object.keys(portfolioActions)
-          };
-        }
-      } catch (e: any) {
-        console.error('[Protocol API] Error creating or using Portfolio service:', e);
-        console.error('[Protocol API] Error stack:', e.stack);
-        result = { error: e.message || 'Portfolio error', stack: e.stack };
-      }
-    }
     else {
       result = { status: 'Unsupported protocol', op };
     }
@@ -851,4 +640,4 @@ export async function POST(req: NextRequest) {
     summary,
     threadId: currentThreadId,
   });
-}
+} 

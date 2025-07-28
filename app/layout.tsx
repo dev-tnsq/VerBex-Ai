@@ -10,9 +10,9 @@ import {
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Verbex AI - Your Intelligent DeFi Companion",
-  description: "Navigate Stellar DeFi with confidence across Blend, Soroswap, and DeFindex. Professional portfolio management powered by AI.",
-  generator: 'Verbex AI'
+  title: "Web3 AI Assistant",
+  description: "Your intelligent companion for blockchain and Web3 development",
+    generator: 'v0.dev'
 }
 
 export default function RootLayout({
