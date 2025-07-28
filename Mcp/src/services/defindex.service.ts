@@ -5,33 +5,34 @@ import stellarSdk from '@stellar/stellar-sdk';
 // DeFindex Testnet Configuration - Real contract addresses
 const DEFINDEX_CONFIG = {
   // Factory contract for creating new vaults
-  FACTORY: "CBQHNAXSI55GX2GN6D67GK7BHVPSLJUGZQEU7WJ5LKR5PNUCGLIMAO4K",
+  FACTORY: "CCJDRCK7VBZV6KEJ433F2KXNELEGAAXYMQWFG6JGLVYATJ4SDEYLRWMD",
   
   // Real strategy contracts from the testnet deployment
   STRATEGIES: {
     // Blend Fixed Income Strategies
-    USDC_BLEND_FIXED: "CAXB6XH4IUAE6MFXXY2RVDTS2FQCCE3QJFCPQ5VBATM3ULQCHQMF6AIU",
-    XLM_BLEND_FIXED: "CBXB6XH4IUAE6MFXXY2RVDTS2FQCCE3QJFCPQ5VBATM3ULQCHQMF6AIU", 
-    EURC_BLEND_FIXED: "CCXB6XH4IUAE6MFXXY2RVDTS2FQCCE3QJFCPQ5VBATM3ULQCHQMF6AIU",
+    XLM_BLEND_FIXED: "CBO77JLVAT54YBRHBY4PSITLILWAAXX5JHPXGBFRW2XUFQKXZ3ZLJ7MJ",
+    USDC_BLEND_FIXED: "CA57GWLEGS2N5GLSKHQGAA4LKVKFL3MROF2SPFY6CVNDYWH3BUU5VKK7",
     
-    // YieldBlox Optimized Strategies
-    USDC_YIELDBLOX: "CDXB6XH4IUAE6MFXXY2RVDTS2FQCCE3QJFCPQ5VBATM3ULQCHQMF6AIU",
-    XLM_YIELDBLOX: "CEXB6XH4IUAE6MFXXY2RVDTS2FQCCE3QJFCPQ5VBATM3ULQCHQMF6AIU",
-    EURC_YIELDBLOX: "CFXB6XH4IUAE6MFXXY2RVDTS2FQCCE3QJFCPQ5VBATM3ULQCHQMF6AIU",
-    
-    // Soroswap LP Strategies
-    USDC_XLM_LP: "CGXB6XH4IUAE6MFXXY2RVDTS2FQCCE3QJFCPQ5VBATM3ULQCHQMF6AIU",
-    EURC_XLM_LP: "CHXB6XH4IUAE6MFXXY2RVDTS2FQCCE3QJFCPQ5VBATM3ULQCHQMF6AIU",
-    
-    // Multi-Strategy Vaults
-    USDC_MULTI_STRATEGY: "CIXB6XH4IUAE6MFXXY2RVDTS2FQCCE3QJFCPQ5VBATM3ULQCHQMF6AIU",
-    XLM_MULTI_STRATEGY: "CJXB6XH4IUAE6MFXXY2RVDTS2FQCCE3QJFCPQ5VBATM3ULQCHQMF6AIU",
+    // Blend YieldBlox Strategies
+    XLM_BLEND_YIELDBLOX: "CBX562AQZZRGIFBLVTQAGIHXOQX6L2MXJLJNL5O2GUZ7EZ6HSKB36BKY",
+    USDC_BLEND_YIELDBLOX: "CBS6674G4T5VJMDWCAI7RWRFL7N4X3W56BW474CEB7PJXJXJPYKHBIQP",
   },
   
-  // Protocol addresses
-  BLEND_PROTOCOL: "CCJDRCK7VBZV6KEJ433F2KXNELEGAAXYMQWFG6JGLVYATJ4SDEYLRWMD",
-  YIELDBLOX_PROTOCOL: "CDJDRCK7VBZV6KEJ433F2KXNELEGAAXYMQWFG6JGLVYATJ4SDEYLRWMD",
-  SOROSWAP_PROTOCOL: "CEJDRCK7VBZV6KEJ433F2KXNELEGAAXYMQWFG6JGLVYATJ4SDEYLRWMD",
+  // Known vaults
+  VAULTS: {
+    USDC_BLEND_VAULT: "CA6HRC4R3LHPTVW6FMCSLIGDCLHEBCJZJFEOOJATGNCCJCVJBZXG6YFM"
+  },
+  
+  // Assets
+  ASSETS: {
+    XLM: "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+    USDC: "CAQCFVLOBK5GIULPNZRGATJJMIZL5BSP7X5YJVMGCPTUEPFM4AVSRCJU"
+  },
+  
+  // Blend pool addresses
+  POOLS: {
+    FIXED_XLM_USDC: "CCLBPEYS3XFK65MYYXSBMOGKUI4ODN5S7SUZBGD7NALUQF64QILLX5B5"
+  }
 };
 
 // Asset configuration with real testnet asset addresses
@@ -43,28 +44,10 @@ const ASSETS = {
     name: 'Stellar Lumens'
   },
   'USDC': {
-    address: 'CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3CIHMXQDAMA',
+    address: 'CAQCFVLOBK5GIULPNZRGATJJMIZL5BSP7X5YJVMGCPTUEPFM4AVSRCJU',
     decimals: 7,
     symbol: 'USDC',
     name: 'USD Coin'
-  },
-  'EURC': {
-    address: 'CAQCFVLOBK5GIULPNZRGATJJMIZL5BSP7X5YJVMGCSEQEQXG5CWBKBKP',
-    decimals: 7,
-    symbol: 'EURC',
-    name: 'Euro Coin'
-  },
-  'BTC': {
-    address: 'CBTJUQY5VKQP4XKQHJA4XTNRQNC3QCHM6QWGQFVJKQP4XKQHJA4XTNR',
-    decimals: 7,
-    symbol: 'BTC',
-    name: 'Bitcoin'
-  },
-  'ETH': {
-    address: 'CEQKUQY5VKQP4XKQHJA4XTNRQNC3QCHM6QWGQFVJKQP4XKQHJA4XTNR',
-    decimals: 7,
-    symbol: 'ETH',
-    name: 'Ethereum'
   },
   'BLND': {
     address: 'CB22KRA3YZVCNCQI64JQ5WE7UY2VAV7WFLK6A2JN3HEX56T2EDAFO7QF',
@@ -91,38 +74,20 @@ const STRATEGY_DEFINITIONS = {
     autoCompound: true,
     rebalanceFrequency: "daily",
     maxDrawdown: 0.05, // 5%
-    targetAPY: { USDC: 8.5, XLM: 6.8, EURC: 7.2 },
-    protocol: "Blend"
+    targetAPY: { USDC: 8.5, XLM: 6.8 },
+    protocol: "Blend",
+    poolName: "fixed_xlm_usdc"
   },
-  YIELDBLOX: {
-    name: "YieldBlox Optimized",
-    description: "Optimized lending through YieldBlox protocol with dynamic rebalancing",
-    riskLevel: "Medium",
-    autoCompound: true,
-    rebalanceFrequency: "hourly",
-    maxDrawdown: 0.15, // 15%
-    targetAPY: { USDC: 12.3, XLM: 9.5, EURC: 10.8 },
-    protocol: "YieldBlox"
-  },
-  LP_STRATEGY: {
-    name: "Liquidity Provider",
-    description: "Provides liquidity to DEX pools for trading fees and yield farming",
-    riskLevel: "Medium-High",
-    autoCompound: true,
-    rebalanceFrequency: "daily",
-    maxDrawdown: 0.25, // 25%
-    targetAPY: { "USDC-XLM": 15.2, "EURC-XLM": 13.8 },
-    protocol: "Soroswap"
-  },
-  MULTI_STRATEGY: {
-    name: "Multi-Strategy Vault",
-    description: "Diversified strategy combining multiple protocols for optimal returns",
+  BLEND_YIELDBLOX: {
+    name: "Blend YieldBlox Strategy",
+    description: "Optimized lending through Blend protocol with dynamic allocation",
     riskLevel: "Medium",
     autoCompound: true,
     rebalanceFrequency: "daily",
-    maxDrawdown: 0.12, // 12%
-    targetAPY: { USDC: 10.5, XLM: 8.2, EURC: 9.1 },
-    protocol: "Multi"
+    maxDrawdown: 0.10, // 10%
+    targetAPY: { USDC: 9.5, XLM: 7.8 },
+    protocol: "Blend",
+    poolName: "yieldblox_strategy"
   }
 };
 
@@ -138,7 +103,7 @@ export class DeFindexService {
     
     // Initialize API client with proper API key
     this.axiosInstance = axios.create({
-      baseURL: 'https://api.defindex.io/v1',
+      baseURL: 'https://api.defindex.io',
       headers: { 
         'Content-Type': 'application/json',
           'Authorization': `Bearer sk_2379462dc41b6c3b83ee593f4803adf4098d85de6e13ce9a95f9a4c9f5c90630`, // API key for testnet
@@ -150,7 +115,7 @@ export class DeFindexService {
       sorobanRpcUrl: NETWORK_CONFIG.sorobanRpcUrl,
       rpcUrl: NETWORK_CONFIG.rpcUrl,
       networkPassphrase: NETWORK_CONFIG.networkPassphrase,
-      apiEndpoint: 'https://api.defindex.io/v1'
+      apiEndpoint: 'https://api.defindex.io'
     });
   }
 
@@ -837,7 +802,7 @@ export class DeFindexService {
     }
   }
 
-  // 3. Create a new vault
+  // 3. Create a new vault using the factory API
   async createVault({ 
     userAddress, 
     strategyId, 
@@ -860,6 +825,7 @@ export class DeFindexService {
     });
     
     try {
+      // Get strategy information
       const strategies = await this.getAvailableStrategies();
       const strategy = strategies.strategies?.find((s: any) => s.id === strategyId);
       
@@ -868,25 +834,56 @@ export class DeFindexService {
       }
 
       const assetAddress = this.getAssetAddress(asset);
-      const depositAmount = initialDeposit > 0 ? this.toStroops(initialDeposit, asset) : "0";
+      const vaultNameFormatted = vaultName || `${asset} Vault`;
+      const vaultSymbol = `${asset.slice(0, 3)}V`;
       
-      // Build create vault transaction
-      const args = [
-        stellarSdk.Address.fromString(assetAddress).toScVal(), // asset
-        stellarSdk.Address.fromString(strategy.address).toScVal(), // strategy
-        stellarSdk.nativeToScVal(depositAmount, { type: "i128" }), // initial deposit
-        stellarSdk.nativeToScVal(vaultName || `${asset} Vault`, { type: "string" }), // vault name
-        stellarSdk.Address.fromString(emergencyManager || userAddress).toScVal(), // emergency manager
-        stellarSdk.Address.fromString(feeReceiver || userAddress).toScVal(), // fee receiver
-      ];
-
-      const xdr = await this.buildTransaction(
-        userAddress, 
-        DEFINDEX_CONFIG.FACTORY, 
-        'create_defindex_vault', 
-        args
-      );
-
+      console.log('[DeFindexService] Calling DeFindex API to create vault');
+      
+      // If we have an initial deposit, use the create-vault-deposit endpoint
+      const endpoint = initialDeposit > 0 ? '/factory/create-vault-deposit' : '/factory/create-vault';
+      
+      const payload = {
+        roles: {
+          // Set roles based on input or default to caller
+          "0": userAddress, // Admin role
+          "1": emergencyManager || userAddress, // Emergency role
+          "2": feeReceiver || userAddress // Fee receiver role
+        },
+        vault_fee_bps: 1000, // 10% fee in basis points
+        assets: [{
+          asset: assetAddress,
+          strategy: strategy.address
+        }],
+        name_symbol: {
+          name: vaultNameFormatted,
+          symbol: vaultSymbol
+        },
+        upgradable: true,
+        caller: userAddress
+      };
+      
+      // Add deposit amounts if using the deposit endpoint
+      if (initialDeposit > 0) {
+        const depositAmount = this.toStroops(initialDeposit, asset);
+        (payload as any).deposit_amounts = [depositAmount];
+      }
+      
+      console.log(`[DeFindexService] API request to ${endpoint}:`, payload);
+      
+      // Make API call to create vault
+      const response = await this.axiosInstance.post(endpoint, payload, {
+        params: { network: 'testnet' }
+      });
+      
+      console.log('[DeFindexService] API response:', response.data);
+      
+      // Extract XDR from response
+      const xdr = response.data.xdr || response.data.transaction;
+      
+      if (!xdr) {
+        throw new Error('API response did not contain transaction XDR');
+      }
+      
       return {
         status: "READY",
         xdr,
@@ -898,9 +895,10 @@ export class DeFindexService {
           asset,
           assetAddress,
           initialDeposit,
-          vaultName: vaultName || `${asset} Vault`,
+          vaultName: vaultNameFormatted,
           estimatedAPY: strategy.currentAPY,
-          riskLevel: strategy.riskLevel
+          riskLevel: strategy.riskLevel,
+          responseData: response.data
         }
       };
     } catch (error: any) {
@@ -913,7 +911,7 @@ export class DeFindexService {
     }
   }
 
-  // Get user balance with API integration
+  // Get user balance using vault API
   async getBalance({ userAddress, vaultAddress }: {
     userAddress: string;
     vaultAddress: string;
@@ -921,127 +919,46 @@ export class DeFindexService {
     console.log('[DeFindexService] getBalance called with:', { userAddress, vaultAddress });
     
     try {
-      // First try the API
-      console.log('[DeFindexService] Calling DeFindex API for balance');
-      try {
-        const response = await this.axiosInstance.get(`/users/${userAddress}/balances/${vaultAddress}`);
-        console.log(`[DeFindexService] API returned balance data:`, response.data);
-        
-        if (response.data && response.data.status === "OK") {
-          return {
-            status: "OK",
-            balance: response.data.balance,
-            shares: response.data.shares || response.data.balance,
-            sharePrice: response.data.sharePrice || 1,
-            vaultAddress,
-            userAddress,
-            breakdown: response.data.breakdown || {
-              principal: response.data.balance * 0.85,
-              earnings: response.data.balance * 0.15,
-              pendingRewards: response.data.balance * 0.02,
-              totalValue: response.data.balance
-            },
-            performance: response.data.performance || {
-              totalReturn: response.data.balance * 0.15,
-              totalReturnPercent: 15.0,
-              dailyReturn: response.data.balance * 0.001,
-              dailyReturnPercent: 0.1
-            }
-          };
+      console.log('[DeFindexService] Calling DeFindex vault API for balance');
+      
+      // Use the vault balance endpoint from API docs
+      const response = await this.axiosInstance.get(`/vault/${vaultAddress}/balance`, {
+        params: {
+          from: userAddress,
+          network: 'testnet'
         }
-      } catch (apiError) {
-        console.error('[DeFindexService] API balance check failed:', apiError);
-        console.log('[DeFindexService] Falling back to contract simulation');
+      });
+      
+      console.log(`[DeFindexService] API returned balance data:`, response.data);
+      
+      if (!response.data) {
+        throw new Error('API returned empty response');
       }
       
-      // Fallback to contract simulation
-      console.log('[DeFindexService] Simulating balance check with contract');
-      const args = [stellarSdk.Address.fromString(userAddress).toScVal()];
+      // Process API response
+      const balanceData = response.data;
       
-      try {
-        const account = await this.server.getAccount(userAddress);
-        const operation = stellarSdk.Operation.invokeContract({
-          contract: vaultAddress,
-          function: 'balance',
-          args: args,
-        });
-
-        const transaction = new stellarSdk.TransactionBuilder(account, {
-          fee: stellarSdk.BASE_FEE,
-          networkPassphrase: NETWORK_CONFIG.networkPassphrase,
-        })
-          .addOperation(operation)
-          .setTimeout(300)
-          .build();
-
-        const simResponse = await this.server.simulateTransaction(transaction);
-        
-        if (stellarSdk.rpc.Api.isSimulationError(simResponse)) {
-          console.log('[DeFindexService] Simulation failed, returning mock data');
-          // For demo purposes, return mock data if simulation fails
-          const mockBalance = Math.random() * 1000;
-          const mockShares = mockBalance * (1 + Math.random() * 0.1);
-          
-          return {
-            status: "OK",
-            balance: mockBalance,
-            shares: mockShares,
-            sharePrice: mockBalance / mockShares,
-            vaultAddress,
-            userAddress,
-            breakdown: {
-              principal: mockBalance * 0.85,
-              earnings: mockBalance * 0.15,
-              pendingRewards: mockBalance * 0.02,
-              totalValue: mockBalance
-            },
-            performance: {
-              totalReturn: mockBalance * 0.15,
-              totalReturnPercent: 15.0,
-              dailyReturn: mockBalance * 0.001,
-              dailyReturnPercent: 0.1
-            }
-          };
-        }
-
-        // Extract balance from simulation result
-        console.log('[DeFindexService] Extracting balance from simulation result');
-        const result = simResponse.result;
-        let balance = 0;
-        
-        if (result && result.retval) {
-          const scVal = result.retval;
-          if (scVal.switch && scVal.switch().name === 'scvI128') {
-            const balanceValue = stellarSdk.scValToNative(scVal);
-            balance = this.fromStroops(balanceValue.toString(), "USDC");
-            console.log(`[DeFindexService] Extracted balance: ${balance}`);
-          }
-        }
-
-        return {
-          status: "OK",
-          balance,
-          vaultAddress,
-          userAddress,
-          shares: balance * 1.05,
-          sharePrice: 1.05,
-          breakdown: {
-            principal: balance * 0.85,
-            earnings: balance * 0.15,
-            pendingRewards: balance * 0.02,
-            totalValue: balance
-          },
-          performance: {
-            totalReturn: balance * 0.15,
-            totalReturnPercent: 15.0,
-            dailyReturn: balance * 0.001,
-            dailyReturnPercent: 0.1
-          }
-        };
-      } catch (simError: any) {
-        console.error('[DeFindexService] Balance simulation error:', simError);
-        throw new Error(`Balance simulation failed: ${simError.message}`);
-      }
+      return {
+        status: "OK",
+        balance: balanceData.balance || 0,
+        shares: balanceData.shares || balanceData.balance || 0,
+        sharePrice: balanceData.sharePrice || 1,
+        vaultAddress,
+        userAddress,
+        breakdown: balanceData.breakdown || {
+          principal: balanceData.balance * 0.85,
+          earnings: balanceData.balance * 0.15,
+          pendingRewards: balanceData.balance * 0.02,
+          totalValue: balanceData.balance
+        },
+        performance: balanceData.performance || {
+          totalReturn: balanceData.balance * 0.15,
+          totalReturnPercent: 15.0,
+          dailyReturn: balanceData.balance * 0.001,
+          dailyReturnPercent: 0.1
+        },
+        rawData: balanceData
+      };
     } catch (error: any) {
       console.error('[DeFindexService] getBalance error:', error?.message);
       return {
@@ -1052,7 +969,7 @@ export class DeFindexService {
     }
   }
 
-  // Deposit with real API integration
+  // Deposit using vault API
   async deposit({ userAddress, vaultAddress, amount, asset }: {
     userAddress: string;
     vaultAddress: string;
@@ -1068,110 +985,75 @@ export class DeFindexService {
       
       // Get vault info to show investment details
       console.log(`[DeFindexService] Fetching vault info for ${vaultAddress}`);
-      const vaults = await this.getAvailableVaults();
-      const vault = vaults.vaults?.find((v: any) => v.address === vaultAddress);
+      const vaultResponse = await this.axiosInstance.get(`/vault/${vaultAddress}`, {
+        params: { network: 'testnet' }
+      });
+      
+      const vault = vaultResponse.data;
       
       if (vault) {
-        console.log(`[DeFindexService] Found vault: ${vault.name}, strategy: ${vault.strategy.name}, APY: ${vault.performance.currentAPY}%`);
+        console.log(`[DeFindexService] Found vault info:`, vault);
       } else {
-        console.warn(`[DeFindexService] Vault not found in available vaults: ${vaultAddress}`);
+        console.warn(`[DeFindexService] Vault info not found: ${vaultAddress}`);
       }
       
-      // First try the API route
-      console.log(`[DeFindexService] Calling DeFindex API to prepare deposit transaction`);
-      try {
-        const apiResponse = await this.axiosInstance.post('/transactions/deposit', {
-          userAddress,
-          vaultAddress,
-          amount: amountInStroops,
-          asset: this.getAssetAddress(asset)
-        });
-        
-        if (apiResponse.data && apiResponse.data.xdr) {
-          console.log(`[DeFindexService] API successfully created deposit transaction, XDR length: ${apiResponse.data.xdr.length}`);
-          
-          // Calculate projected earnings
-          const currentAPY = vault?.performance.currentAPY || 10;
-          const dailyEarnings = amount * currentAPY / 365 / 100;
-          const monthlyEarnings = amount * currentAPY / 12 / 100;
-          const yearlyEarnings = amount * currentAPY / 100;
-          
-          console.log(`[DeFindexService] Deposit transaction prepared with projected APY: ${currentAPY}%`);
-          console.log(`[DeFindexService] Projected earnings: Daily: ${dailyEarnings}, Monthly: ${monthlyEarnings}, Yearly: ${yearlyEarnings}`);
-          
-          return {
-            status: "READY",
-            xdr: apiResponse.data.xdr,
-            message: `Deposit ${amount} ${asset} into ${vault?.name || 'DeFindex vault'}`,
-            details: {
-              action: "deposit",
-              vaultAddress,
-              amount,
-              asset,
-              amountInStroops,
-              vault: vault ? {
-                name: vault.name,
-                strategy: vault.strategy,
-                currentAPY: vault.performance.currentAPY,
-                riskLevel: vault.strategy.riskLevel,
-                autoCompound: vault.strategy.autoCompound
-              } : null,
-              projectedEarnings: {
-                daily: dailyEarnings,
-                monthly: monthlyEarnings,
-                yearly: yearlyEarnings
-              }
-            }
-          };
-        }
-      } catch (apiError) {
-        console.error('[DeFindexService] API deposit transaction failed:', apiError);
-        console.log('[DeFindexService] Falling back to local transaction building');
+      // Call the deposit endpoint from the API docs
+      console.log(`[DeFindexService] Calling DeFindex vault API to create deposit transaction`);
+      
+      const depositResponse = await this.axiosInstance.post(`/vault/${vaultAddress}/deposit`, {
+        amounts: [amountInStroops],
+        from: userAddress,
+        invest: true,
+        slippageBps: 50 // 0.5% slippage tolerance
+      }, {
+        params: { network: 'testnet' }
+      });
+      
+      console.log(`[DeFindexService] API deposit response:`, depositResponse.data);
+      
+      if (!depositResponse.data) {
+        throw new Error('API returned empty response for deposit');
       }
       
-      // Fallback to local transaction building if API fails
-      console.log(`[DeFindexService] Preparing contract arguments for deposit`);
-      const args = [
-        stellarSdk.nativeToScVal(amountInStroops, { type: "i128" }),
-        stellarSdk.Address.fromString(userAddress).toScVal()
-      ];
-      console.log(`[DeFindexService] Contract arguments prepared:`, args);
-
-      console.log(`[DeFindexService] Building deposit transaction`);
-      const xdr = await this.buildTransaction(userAddress, vaultAddress, 'deposit', args);
-      console.log(`[DeFindexService] Transaction built, XDR length: ${xdr.length}`);
-
+      // Extract transaction XDR
+      const xdr = depositResponse.data.xdr || depositResponse.data.transaction;
+      
+      if (!xdr) {
+        throw new Error('API response did not contain transaction XDR');
+      }
+      
+      // Get APY info for projected earnings
+      const apyResponse = await this.axiosInstance.get(`/vault/${vaultAddress}/apy`, {
+        params: { network: 'testnet' }
+      });
+      
+      const currentAPY = apyResponse.data?.apy || 10;
+      
       // Calculate projected earnings
-      const currentAPY = vault?.performance.currentAPY || 10;
       const dailyEarnings = amount * currentAPY / 365 / 100;
       const monthlyEarnings = amount * currentAPY / 12 / 100;
       const yearlyEarnings = amount * currentAPY / 100;
       
       console.log(`[DeFindexService] Deposit transaction prepared with projected APY: ${currentAPY}%`);
       console.log(`[DeFindexService] Projected earnings: Daily: ${dailyEarnings}, Monthly: ${monthlyEarnings}, Yearly: ${yearlyEarnings}`);
-
+      
       return {
         status: "READY",
         xdr,
-        message: `Deposit ${amount} ${asset} into ${vault?.name || 'DeFindex vault'}`,
+        message: `Deposit ${amount} ${asset} into vault`,
         details: {
           action: "deposit",
           vaultAddress,
           amount,
           asset,
           amountInStroops,
-          vault: vault ? {
-            name: vault.name,
-            strategy: vault.strategy,
-            currentAPY: vault.performance.currentAPY,
-            riskLevel: vault.strategy.riskLevel,
-            autoCompound: vault.strategy.autoCompound
-          } : null,
+          vault: vault,
           projectedEarnings: {
             daily: dailyEarnings,
             monthly: monthlyEarnings,
             yearly: yearlyEarnings
-          }
+          },
+          apiResponse: depositResponse.data
         }
       };
     } catch (error: any) {
@@ -1185,7 +1067,7 @@ export class DeFindexService {
     }
   }
 
-  // Withdraw with real API integration
+  // Withdraw using vault API
   async withdraw({ userAddress, vaultAddress, amount, asset }: {
     userAddress: string;
     vaultAddress: string;
@@ -1198,58 +1080,38 @@ export class DeFindexService {
       const amountInStroops = this.toStroops(amount, asset);
       console.log(`[DeFindexService] Amount in stroops: ${amountInStroops}`);
       
-      // Get current balance to calculate performance
+      // Get current balance
       const balanceResult = await this.getBalance({ userAddress, vaultAddress });
       console.log(`[DeFindexService] Current balance: ${balanceResult.balance || 0}`);
       
-      // First try the API route
-      console.log(`[DeFindexService] Calling DeFindex API to prepare withdraw transaction`);
-      try {
-        const apiResponse = await this.axiosInstance.post('/transactions/withdraw', {
-          userAddress,
-          vaultAddress,
-          amount: amountInStroops,
-          asset: this.getAssetAddress(asset)
-        });
-        
-        if (apiResponse.data && apiResponse.data.xdr) {
-          console.log(`[DeFindexService] API successfully created withdraw transaction, XDR length: ${apiResponse.data.xdr.length}`);
-          
-          return {
-            status: "READY",
-            xdr: apiResponse.data.xdr,
-            message: `Withdraw ${amount} ${asset} from DeFindex vault`,
-            details: {
-              action: "withdraw",
-              vaultAddress,
-              amount,
-              asset,
-              amountInStroops,
-              currentBalance: balanceResult.balance || 0,
-              remainingBalance: (balanceResult.balance || 0) - amount,
-              performance: balanceResult.performance || null
-            }
-          };
-        }
-      } catch (apiError) {
-        console.error('[DeFindexService] API withdraw transaction failed:', apiError);
-        console.log('[DeFindexService] Falling back to local transaction building');
+      // Call the withdraw endpoint from the API docs
+      console.log(`[DeFindexService] Calling DeFindex vault API to create withdraw transaction`);
+      
+      const withdrawResponse = await this.axiosInstance.post(`/vault/${vaultAddress}/withdraw`, {
+        amounts: [amountInStroops],
+        from: userAddress,
+        slippageBps: 50 // 0.5% slippage tolerance
+      }, {
+        params: { network: 'testnet' }
+      });
+      
+      console.log(`[DeFindexService] API withdraw response:`, withdrawResponse.data);
+      
+      if (!withdrawResponse.data) {
+        throw new Error('API returned empty response for withdraw');
       }
       
-      // Fallback to local transaction building if API fails
-      console.log(`[DeFindexService] Building local withdraw transaction`);
-      const args = [
-        stellarSdk.nativeToScVal(amountInStroops, { type: "i128" }),
-        stellarSdk.Address.fromString(userAddress).toScVal()
-      ];
-
-      const xdr = await this.buildTransaction(userAddress, vaultAddress, 'withdraw', args);
-      console.log(`[DeFindexService] Transaction built, XDR length: ${xdr.length}`);
-
+      // Extract transaction XDR
+      const xdr = withdrawResponse.data.xdr || withdrawResponse.data.transaction;
+      
+      if (!xdr) {
+        throw new Error('API response did not contain transaction XDR');
+      }
+      
       return {
         status: "READY",
         xdr,
-        message: `Withdraw ${amount} ${asset} from DeFindex vault`,
+        message: `Withdraw ${amount} ${asset} from vault`,
         details: {
           action: "withdraw",
           vaultAddress,
@@ -1258,7 +1120,8 @@ export class DeFindexService {
           amountInStroops,
           currentBalance: balanceResult.balance || 0,
           remainingBalance: (balanceResult.balance || 0) - amount,
-          performance: balanceResult.performance || null
+          performance: balanceResult.performance || null,
+          apiResponse: withdrawResponse.data
         }
       };
     } catch (error: any) {
@@ -1271,257 +1134,141 @@ export class DeFindexService {
     }
   }
 
-  // Get user positions using DeFindex API
+  // Get user positions using the API
   async getUserPositions({ userAddress }: { userAddress: string }): Promise<any> {
     console.log('[DeFindexService] getUserPositions called with:', { userAddress });
     
     try {
-      console.log('[DeFindexService] Fetching user positions from API...');
-      const response = await this.axiosInstance.get(`/users/${userAddress}/positions`);
-      console.log(`[DeFindexService] API returned ${response.data.positions?.length || 0} positions`);
+      // Get all vaults and check each one for the user's balance
+      console.log('[DeFindexService] Fetching all vaults to check user positions');
       
-      const positions = response.data.positions || [];
-      let totalValue = 0;
-      let totalEarnings = 0;
-
-      // Process and enrich position data
-      const processedPositions = positions.map((position: any) => {
-        const balance = position.balance || 0;
-        const earnings = position.breakdown?.earnings || (balance * 0.15); // Default 15% earnings
-        
-        totalValue += balance;
-        totalEarnings += earnings;
-        
-        return {
-          vaultAddress: position.vaultAddress,
-          vaultName: position.vaultName,
-          asset: position.asset,
-          strategy: position.strategy,
-          balance: balance,
-          shares: position.shares || balance,
-          sharePrice: position.sharePrice || 1,
-          performance: {
-            currentAPY: position.performance?.currentAPY || 0,
-            totalReturn: earnings,
-            totalReturnPercent: position.performance?.totalReturnPercent || 0,
-            dailyReturn: position.performance?.dailyReturn || 0,
-            dailyReturnPercent: position.performance?.dailyReturnPercent || 0
-          },
-          breakdown: position.breakdown || {
-            principal: balance * 0.85,
-            earnings: earnings,
-            pendingRewards: balance * 0.02,
-            totalValue: balance
-          },
-          riskMetrics: position.riskMetrics || {
-            riskLevel: position.strategy?.riskLevel || 'Medium',
-            volatility: position.riskMetrics?.volatility || 0,
-            sharpeRatio: position.riskMetrics?.sharpeRatio || 0,
-            maxDrawdown: position.riskMetrics?.maxDrawdown || 0
-          }
-        };
+      const vaultsResponse = await this.axiosInstance.get('/vault', {
+        params: { network: 'testnet' }
       });
       
-      console.log(`[DeFindexService] Processed ${processedPositions.length} positions, total value: ${totalValue}`);
-
-      // If API returns no positions, fall back to checking vault balances
-      if (!processedPositions.length) {
-        console.log('[DeFindexService] API returned no positions, checking vaults manually...');
-        
-        // Get available vaults
-        const availableVaults = await this.getAvailableVaults();
-        if (availableVaults.status !== "OK") {
-          console.error('[DeFindexService] Failed to get available vaults:', availableVaults);
-          throw new Error("Failed to get available vaults");
-        }
-        console.log(`[DeFindexService] Found ${availableVaults.vaults.length} available vaults to check`);
-
-        // Check balances in each vault
-        for (const vault of availableVaults.vaults) {
-          try {
-            console.log(`[DeFindexService] Checking balance in vault: ${vault.name} (${vault.address})`);
-            const balanceResult = await this.getBalance({ 
-              userAddress, 
-              vaultAddress: vault.address 
+      console.log(`[DeFindexService] Found ${vaultsResponse.data?.vaults?.length || 0} vaults to check`);
+      
+      const vaults = vaultsResponse.data?.vaults || [];
+      const positions: any[] = [];
+      let totalValue = 0;
+      let totalEarnings = 0;
+      
+      // Check user balance in each vault
+      for (const vault of vaults) {
+        try {
+          console.log(`[DeFindexService] Checking balance in vault: ${vault.name || vault.address}`);
+          
+          const balanceResponse = await this.axiosInstance.get(`/vault/${vault.address}/balance`, {
+            params: {
+              from: userAddress,
+              network: 'testnet'
+            }
+          });
+          
+          const balanceData = balanceResponse.data;
+          
+          // If user has a positive balance in this vault
+          if (balanceData && balanceData.balance > 0) {
+            console.log(`[DeFindexService] Found positive balance in vault: ${balanceData.balance}`);
+            
+            // Get APY for this vault
+            const apyResponse = await this.axiosInstance.get(`/vault/${vault.address}/apy`, {
+              params: { network: 'testnet' }
             });
             
-            if (balanceResult.status === "OK" && balanceResult.balance > 0) {
-              console.log(`[DeFindexService] Found positive balance in vault ${vault.name}: ${balanceResult.balance}`);
-              const position = {
-                vaultAddress: vault.address,
-                vaultName: vault.name,
-                asset: vault.asset,
-                strategy: vault.strategy,
-                balance: balanceResult.balance,
-                shares: balanceResult.shares || balanceResult.balance,
-                sharePrice: balanceResult.sharePrice || 1,
-                performance: {
-                  currentAPY: vault.performance.currentAPY,
-                  totalReturn: balanceResult.breakdown?.earnings || 0,
-                  totalReturnPercent: balanceResult.performance?.totalReturnPercent || 0,
-                  dailyReturn: balanceResult.performance?.dailyReturn || 0,
-                  dailyReturnPercent: balanceResult.performance?.dailyReturnPercent || 0
-                },
-                breakdown: balanceResult.breakdown || {
-                  principal: balanceResult.balance * 0.85,
-                  earnings: balanceResult.balance * 0.15,
-                  pendingRewards: balanceResult.balance * 0.02,
-                  totalValue: balanceResult.balance
-                },
-                riskMetrics: {
-                  riskLevel: vault.strategy.riskLevel,
-                  volatility: Math.random() * 20 + 5, // Mock volatility
-                  sharpeRatio: Math.random() * 2 + 0.5, // Mock Sharpe ratio
-                  maxDrawdown: -(Math.random() * 10 + 2) // Mock max drawdown
-                }
-              };
-              
-              processedPositions.push(position);
-              totalValue += position.balance;
-              totalEarnings += position.breakdown.earnings;
-              console.log(`[DeFindexService] Added position for ${vault.name}, total positions: ${processedPositions.length}`);
-            } else {
-              console.log(`[DeFindexService] No balance found in vault ${vault.name} or status not OK:`, balanceResult);
-            }
-          } catch (vaultError) {
-            console.error(`[DeFindexService] Error checking vault ${vault.address}:`, vaultError);
+            const currentAPY = apyResponse.data?.apy || 0;
+            
+            // Get more vault details
+            const vaultResponse = await this.axiosInstance.get(`/vault/${vault.address}`, {
+              params: { network: 'testnet' }
+            });
+            
+            const vaultDetails = vaultResponse.data;
+            
+            // Calculate earnings based on balance and time
+            const principal = balanceData.principal || (balanceData.balance * 0.85);
+            const earnings = balanceData.earnings || (balanceData.balance * 0.15);
+            
+            // Add position to array
+            const position = {
+              vaultAddress: vault.address,
+              vaultName: vaultDetails?.name || vault.name || `Vault ${vault.address.substring(0, 8)}...`,
+              asset: vaultDetails?.asset?.symbol || vault.asset || 'Unknown',
+              strategy: vaultDetails?.strategy || {
+                name: vault.strategyName || 'Unknown Strategy',
+                type: vault.strategyType || 'Unknown',
+                riskLevel: vault.riskLevel || 'Medium'
+              },
+              balance: balanceData.balance,
+              shares: balanceData.shares || balanceData.balance,
+              sharePrice: balanceData.sharePrice || 1,
+              performance: {
+                currentAPY: currentAPY,
+                totalReturn: earnings,
+                totalReturnPercent: earnings > 0 ? (earnings / principal) * 100 : 0,
+                dailyReturn: earnings / 30, // Estimate daily return
+                dailyReturnPercent: (earnings / 30) / principal * 100
+              },
+              breakdown: {
+                principal: principal,
+                earnings: earnings,
+                pendingRewards: balanceData.pendingRewards || (balanceData.balance * 0.02),
+                totalValue: balanceData.balance
+              },
+              lastUpdated: new Date().toISOString()
+            };
+            
+            positions.push(position);
+            totalValue += balanceData.balance;
+            totalEarnings += earnings;
           }
+        } catch (vaultError) {
+          console.error(`[DeFindexService] Error checking balance in vault ${vault.address}:`, vaultError);
+          // Continue with other vaults
         }
       }
-
+      
+      console.log(`[DeFindexService] Found ${positions.length} positions with total value: ${totalValue}`);
+      
       // Calculate portfolio metrics
-      console.log('[DeFindexService] Calculating portfolio metrics...');
       const portfolioMetrics = {
         totalValue,
         totalEarnings,
         totalReturnPercent: totalValue > 0 ? (totalEarnings / (totalValue - totalEarnings)) * 100 : 0,
-        averageAPY: processedPositions.length > 0 ? 
-          processedPositions.reduce((sum: number, p: any) => sum + p.performance.currentAPY, 0) / processedPositions.length : 0,
-        diversificationScore: processedPositions.length * 20, // Simple diversification score
-        riskScore: processedPositions.length > 0 ?
-          processedPositions.reduce((sum: number, p: any) => {
-            const riskMap = { "Low": 1, "Medium": 2, "Medium-High": 3, "High": 4 };
-            return sum + (riskMap[p.riskMetrics.riskLevel as keyof typeof riskMap] || 2);
-          }, 0) / processedPositions.length : 0
+        averageAPY: positions.length > 0 ? 
+          positions.reduce((sum: number, p: any) => sum + p.performance.currentAPY, 0) / positions.length : 0,
+        diversificationScore: Math.min(100, positions.length * 20), // Simple diversification score
+        positions: positions.length
       };
-      console.log('[DeFindexService] Portfolio metrics calculated:', portfolioMetrics);
-
-      console.log(`[DeFindexService] Returning user positions data: ${processedPositions.length} positions found`);
-      return {
-        status: "OK",
-        positions: processedPositions,
-        portfolioMetrics,
-        summary: {
-          totalPositions: processedPositions.length,
-          totalValue,
-          totalEarnings,
-          bestPerformer: processedPositions.length > 0 ? 
-            processedPositions.reduce((best: any, current: any) => 
-              current.performance.totalReturnPercent > best.performance.totalReturnPercent ? current : best
-            , processedPositions[0]) : null
-        }
-      };
-    } catch (error: any) {
-      console.error('[DeFindexService] getUserPositions error:', error?.message, error?.stack);
       
-      // Attempt fallback to manual check if API fails
-      try {
-        console.log('[DeFindexService] API failed, falling back to manual balance checks');
-        
-        // Get available vaults
-        const availableVaults = await this.getAvailableVaults();
-        if (availableVaults.status !== "OK") {
-          throw new Error("Failed to get available vaults");
-        }
-
-        const positions: any[] = [];
-        let totalValue = 0;
-        let totalEarnings = 0;
-        
-        // Check balance in each available vault
-        for (const vault of availableVaults.vaults) {
-          try {
-            const balanceResult = await this.getBalance({ 
-              userAddress, 
-              vaultAddress: vault.address 
-            });
-            
-            if (balanceResult.status === "OK" && balanceResult.balance > 0) {
-              const position = {
-                vaultAddress: vault.address,
-                vaultName: vault.name,
-                asset: vault.asset,
-                strategy: vault.strategy,
-                balance: balanceResult.balance,
-                shares: balanceResult.shares || balanceResult.balance,
-                sharePrice: balanceResult.sharePrice || 1,
-                performance: {
-                  currentAPY: vault.performance.currentAPY,
-                  totalReturn: balanceResult.breakdown?.earnings || 0,
-                  totalReturnPercent: balanceResult.performance?.totalReturnPercent || 0,
-                  dailyReturn: balanceResult.performance?.dailyReturn || 0,
-                  dailyReturnPercent: balanceResult.performance?.dailyReturnPercent || 0
-                },
-                breakdown: balanceResult.breakdown || {
-                  principal: balanceResult.balance * 0.85,
-                  earnings: balanceResult.balance * 0.15,
-                  pendingRewards: balanceResult.balance * 0.02,
-                  totalValue: balanceResult.balance
-                },
-                riskMetrics: {
-                  riskLevel: vault.strategy.riskLevel,
-                  volatility: Math.random() * 20 + 5,
-                  sharpeRatio: Math.random() * 2 + 0.5,
-                  maxDrawdown: -(Math.random() * 10 + 2)
-                }
-              };
-              
-              positions.push(position);
-              totalValue += position.balance;
-              totalEarnings += position.breakdown.earnings;
-            }
-          } catch (vaultError) {
-            console.error(`[DeFindexService] Error checking vault ${vault.address}:`, vaultError);
-          }
-        }
-
-        // Calculate portfolio metrics
-        const portfolioMetrics = {
-          totalValue,
-          totalEarnings,
-          totalReturnPercent: totalValue > 0 ? (totalEarnings / (totalValue - totalEarnings)) * 100 : 0,
-          averageAPY: positions.length > 0 ? 
-            positions.reduce((sum: number, p: any) => sum + p.performance.currentAPY, 0) / positions.length : 0,
-          diversificationScore: positions.length * 20,
-          riskScore: positions.length > 0 ?
-            positions.reduce((sum: number, p: any) => {
-              const riskMap = { "Low": 1, "Medium": 2, "Medium-High": 3, "High": 4 };
-              return sum + (riskMap[p.riskMetrics.riskLevel as keyof typeof riskMap] || 2);
-            }, 0) / positions.length : 0
-        };
-
-        return {
-          status: "OK",
-          positions,
-          portfolioMetrics,
-          summary: {
-            totalPositions: positions.length,
-            totalValue,
-            totalEarnings,
-            bestPerformer: positions.length > 0 ? 
-              positions.reduce((best: any, current: any) => 
-                current.performance.totalReturnPercent > best.performance.totalReturnPercent ? current : best
-              , positions[0]) : null
-          }
-        };
-      } catch (fallbackError) {
-        console.error('[DeFindexService] Fallback also failed:', fallbackError);
+      console.log('[DeFindexService] Portfolio metrics calculated:', portfolioMetrics);
+      
+      // Identify best performer
+      let bestPerformer = null;
+      if (positions.length > 0) {
+        bestPerformer = positions.reduce((best, current) => 
+          current.performance.totalReturnPercent > best.performance.totalReturnPercent ? current : best, 
+          positions[0]
+        );
       }
       
       return {
+        status: "OK",
+        positions,
+        portfolioMetrics,
+        summary: {
+          totalPositions: positions.length,
+          totalValue,
+          totalEarnings,
+          bestPerformer
+        }
+      };
+    } catch (error: any) {
+      console.error('[DeFindexService] getUserPositions error:', error?.message);
+      return {
         status: "ERROR",
         message: error?.message || "Failed to get user positions",
-        error: error?.stack || null
+        error: error?.response?.data || null
       };
     }
   }

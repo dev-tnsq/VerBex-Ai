@@ -25,6 +25,20 @@ const ASSET_ADDRESSES: Record<string, string> = {
   'NYLF': 'CDHNUGDN5ODFN25ADDSDQIOJPQSHFLH3IBFEVMMPYNQKG5Y2UZ5MV4ZW',
 };
 
+// DeFindex strategy mapping for assets
+const DEFINDEX_STRATEGIES: Record<string, string> = {
+  'XLM': 'CBO77JLVAT54YBRHBY4PSITLILWAAXX5JHPXGBFRW2XUFQKXZ3ZLJ7MJ', // XLM Blend Fixed Income Strategy
+  'USDC': 'CA57GWLEGS2N5GLSKHQGAA4LKVKFL3MROF2SPFY6CVNDYWH3BUU5VKK7', // USDC Blend Fixed Income Strategy
+};
+
+// DeFindex specific asset addresses (different from general ASSET_ADDRESSES)
+const DEFINDEX_ASSET_ADDRESSES: Record<string, string> = {
+  'XLM': 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC',
+  'USDC': 'CAQCFVLOBK5GIULPNZRGATJJMIZL5BSP7X5YJVMGCPTUEPFM4AVSRCJU',
+  'BLND': 'CB22KRA3YZVCNCQI64JQ5WE7UY2VAV7WFLK6A2JN3HEX56T2EDAFO7QF'
+};
+ 
+
 // Helper function to convert asset symbols to addresses
 function resolveAssetAddress(asset: string): string {
   // If it's already a contract address (starts with C and 56 chars), return as-is
@@ -37,6 +51,26 @@ function resolveAssetAddress(asset: string): string {
     return address;
   }
   // If not found, return original (might be a valid address we don't know)
+  return asset;
+}
+
+// Helper function specifically for DeFindex asset addresses
+function resolveDefindexAssetAddress(asset: string): string {
+  // If it's already a contract address (starts with C and 56 chars), return as-is
+  if (asset.startsWith('C') && asset.length === 56) {
+    return asset;
+  }
+  // If it's a symbol, convert to DeFindex-specific address
+  const address = DEFINDEX_ASSET_ADDRESSES[asset.toUpperCase()];
+  if (address) {
+    return address;
+  }
+  // Fall back to general asset addresses
+  const generalAddress = ASSET_ADDRESSES[asset.toUpperCase()];
+  if (generalAddress) {
+    return generalAddress;
+  }
+  // If not found in either mapping, return original
   return asset;
 }
 
@@ -301,15 +335,28 @@ export async function POST(req: NextRequest) {
           const defindexActions: Record<string, (params: any) => Promise<any>> = {
             // Vault operations
             createVault: (params: any) => {
-              if (params.asset) params.asset = resolveAssetAddress(params.asset);
+              console.log('[Protocol API] DeFindex createVault with params:', params);
+              
+              // Map asset to appropriate strategy if not provided
+              if (!params.strategyId && params.asset) {
+                const assetSymbol = params.asset.toUpperCase();
+                params.strategyId = DEFINDEX_STRATEGIES[assetSymbol];
+                console.log(`[Protocol API] Mapped ${assetSymbol} to strategy ${params.strategyId}`);
+              }
+              
+              if (!params.strategyId) {
+                return Promise.resolve({ status: 'ERROR', message: 'No suitable strategy found for the asset' });
+              }
+              
+              if (params.asset) params.asset = resolveDefindexAssetAddress(params.asset);
               return defindex.createVault(params);
             },
             deposit: (params: any) => {
-              if (params.asset) params.asset = resolveAssetAddress(params.asset);
+              if (params.asset) params.asset = resolveDefindexAssetAddress(params.asset);
               return defindex.deposit(params);
             },
             withdraw: (params: any) => {
-              if (params.asset) params.asset = resolveAssetAddress(params.asset);
+              if (params.asset) params.asset = resolveDefindexAssetAddress(params.asset);
               return defindex.withdraw(params);
             },
             

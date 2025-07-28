@@ -590,17 +590,13 @@ const defindexFunctionDeclarations = [
   },
   {
     name: 'createVault',
-    description: 'Create a new DeFindex vault with specified strategy',
+    description: 'Create a new DeFindex vault with the specified asset',
     parameters: {
       type: Type.OBJECT,
       properties: {
         userAddress: {
           type: Type.STRING,
           description: 'User wallet address',
-        },
-        strategyId: {
-          type: Type.STRING,
-          description: 'Strategy identifier to use for the vault',
         },
         asset: {
           type: Type.STRING,
@@ -615,7 +611,7 @@ const defindexFunctionDeclarations = [
           description: 'Custom vault name (optional)',
         },
       },
-      required: ['userAddress', 'strategyId', 'asset'],
+      required: ['userAddress', 'asset'],
     },
   },
   {
