@@ -301,27 +301,36 @@ export async function POST(req: NextRequest) {
         }
       } else if (op.protocol === 'DeFindex') {
         // Fallback logic for createVault
+        console.log("createvault action", op.action);
         if (op.action === 'createVault') {
-          const XLM_STRATEGY = 'CBO77JLVAT54YBRHBY4PSITLILWAAXX5JHPXGBFRW2XUFQKXZ3ZLJ7MJ';
-          const USDC_STRATEGY = 'CA57GWLEGS2N5GLSKHQGAA4LKVKFL3MROF2SPFY6CVNDYWH3BUU5VKK7';
-          let { asset, strategyId, vaultName } = params;
-          if (!asset && strategyId) {
-            if (strategyId === XLM_STRATEGY) params.asset = 'XLM';
-            if (strategyId === USDC_STRATEGY) params.asset = 'USDC';
+          // Strategy contract addresses mapping by asset symbol
+          const STRATEGY_IDS = {
+            'XLM': 'CBO77JLVAT54YBRHBY4PSITLILWAAXX5JHPXGBFRW2XUFQKXZ3ZLJ7MJ',
+            'USDC': 'CA57GWLEGS2N5GLSKHQGAA4LKVKFL3MROF2SPFY6CVNDYWH3BUU5VKK7',
+          };
+          
+          console.log('[Protocol API] createVault debug - params before mapping:', params);
+          console.log('[Protocol API] createVault debug - asset type:', typeof params.asset);
+          console.log('[Protocol API] createVault debug - asset value:', params.asset);
+          console.log('[Protocol API] createVault debug - strategyId before:', params.strategyId);
+          
+          // Only set strategyId if not already provided
+          if (!params.strategyId && typeof params.asset === 'string' && STRATEGY_IDS[params.asset.toUpperCase() as keyof typeof STRATEGY_IDS]) {
+            params.strategyId = STRATEGY_IDS[params.asset.toUpperCase() as keyof typeof STRATEGY_IDS];
+            console.log('[Protocol API] createVault debug - strategyId set to:', params.strategyId);
+          } else {
+            console.log('[Protocol API] createVault debug - strategyId not set, conditions not met');
+            console.log('[Protocol API] createVault debug - !params.strategyId:', !params.strategyId);
+            console.log('[Protocol API] createVault debug - typeof params.asset === string:', typeof params.asset === 'string');
+            console.log('[Protocol API] createVault debug - asset.toUpperCase():', params.asset?.toUpperCase());
+            console.log('[Protocol API] createVault debug - STRATEGY_IDS key exists:', params.asset ? STRATEGY_IDS[params.asset.toUpperCase() as keyof typeof STRATEGY_IDS] : 'N/A');
           }
-          if (params.asset) {
-            const upper = params.asset.toUpperCase();
-            if ((upper === 'XLM' || upper === ASSET_ADDRESSES.XLM) && (!strategyId || !isContractAddress(strategyId))) {
-              params.strategyId = XLM_STRATEGY;
-            }
-            if ((upper === 'USDC' || upper === ASSET_ADDRESSES.USDC) && (!strategyId || !isContractAddress(strategyId))) {
-              params.strategyId = USDC_STRATEGY;
-            }
-            params.asset = ASSET_ADDRESSES[upper] || params.asset;
-          }
+          
           if (!params.vaultName && params.asset) {
             params.vaultName = `${params.asset} Vault`;
           }
+          
+          console.log('[Protocol API] createVault debug - params after mapping:', params);
         }
         try {
           const defindex = new DeFindexService();
@@ -351,10 +360,15 @@ export async function POST(req: NextRequest) {
           const fn = defindexActions[op.action];
           if (fn) {
             const defindexResult = await fn(params);
-            if (defindexResult && defindexResult.xdr) xdr = defindexResult.xdr;
-            if (defindexResult && defindexResult.txHash) txHash = defindexResult.txHash;
-            if (defindexResult && defindexResult.summary) summary = defindexResult.summary;
-            result = defindexResult;
+            if (defindexResult && defindexResult.xdr) {
+              result = {
+                status: 'NEEDS_SIGNATURE',
+                unsignedXDR: defindexResult.xdr,
+                summary: 'Sign this transaction to create your vault.'
+              };
+            } else {
+              result = defindexResult;
+            }
             // --- Update dynamic context with new keys from result ---
             if (result && typeof result === 'object') {
               for (const key of Object.keys(result)) {
@@ -517,6 +531,40 @@ export async function POST(req: NextRequest) {
     else if (op.protocol === 'DeFindex') {
       try {
         const defindex = new DeFindexService();
+        
+        // Strategy mapping for createVault
+        if (op.action === 'createVault') {
+          // Strategy contract addresses mapping by asset symbol
+          const STRATEGY_IDS = {
+            'XLM': 'CBO77JLVAT54YBRHBY4PSITLILWAAXX5JHPXGBFRW2XUFQKXZ3ZLJ7MJ',
+            'USDC': 'CA57GWLEGS2N5GLSKHQGAA4LKVKFL3MROF2SPFY6CVNDYWH3BUU5VKK7',
+          };
+          
+          console.log('[Protocol API] createVault debug - params before mapping:', op.parameters);
+          console.log('[Protocol API] createVault debug - asset type:', typeof op.parameters.asset);
+          console.log('[Protocol API] createVault debug - asset value:', op.parameters.asset);
+          console.log('[Protocol API] createVault debug - strategyId before:', op.parameters.strategyId);
+          
+          // Always set strategyId for XLM/USDC assets to ensure correct contract address
+          if (typeof op.parameters.asset === 'string' && STRATEGY_IDS[op.parameters.asset.toUpperCase() as keyof typeof STRATEGY_IDS]) {
+            const correctStrategyId = STRATEGY_IDS[op.parameters.asset.toUpperCase() as keyof typeof STRATEGY_IDS];
+            if (op.parameters.strategyId !== correctStrategyId) {
+              console.log('[Protocol API] createVault debug - replacing strategyId:', op.parameters.strategyId, '->', correctStrategyId);
+              op.parameters.strategyId = correctStrategyId;
+            } else {
+              console.log('[Protocol API] createVault debug - strategyId already correct:', op.parameters.strategyId);
+            }
+          } else {
+            console.log('[Protocol API] createVault debug - no strategy mapping found for asset:', op.parameters.asset);
+          }
+          
+          if (!op.parameters.vaultName && op.parameters.asset) {
+            op.parameters.vaultName = `${op.parameters.asset} Vault`;
+          }
+          
+          console.log('[Protocol API] createVault debug - params after mapping:', op.parameters);
+        }
+        
         // Map Gemini action name to DeFindexService method
         const defindexActions: Record<string, (params: any) => Promise<any>> = {
           // Vault operations
@@ -528,7 +576,18 @@ export async function POST(req: NextRequest) {
             if (params.asset) params.asset = resolveAssetAddress(params.asset);
             return defindex.withdraw(params);
           },
-          createVault: defindex.createVault.bind(defindex),
+          createVault: (params: any) => {
+            // Pass initialDeposit if present
+            return defindex.createVault({
+              userAddress: params.userAddress,
+              strategyId: params.strategyId,
+              asset: params.asset,
+              initialDeposit: params.initialDeposit || 0,
+              vaultName: params.vaultName,
+              emergencyManager: params.emergencyManager,
+              feeReceiver: params.feeReceiver
+            });
+          },
           
           // Query operations
           getBalance: defindex.getBalance.bind(defindex),

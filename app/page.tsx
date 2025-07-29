@@ -315,6 +315,21 @@ export default function Web3ChatInterface() {
       
       setPendingGemini(data.intent);
       setPendingBlend(data.result);
+
+      // Log the XDR process for debugging
+      if (data.unsignedXDR) {
+        console.log('[XDR Debug] Received unsignedXDR:', data.unsignedXDR);
+        setPendingXdr(data.unsignedXDR);
+      }
+      if (data.xdrs) {
+        console.log('[XDR Debug] Received xdrs array:', data.xdrs);
+      }
+      if (data.txHashes) {
+        console.log('[XDR Debug] Received txHashes:', data.txHashes);
+      }
+      if (data.summaries) {
+        console.log('[XDR Debug] Received summaries:', data.summaries);
+      }
       
       // Handle conversational AI responses
       if (data.xdr) {
@@ -434,6 +449,7 @@ ${JSON.stringify(data.result, null, 2)}
         type: 'status'
       };
       setMessages((prev) => [...prev, signingMessage]);
+      console.log('[XDR Debug] About to sign XDR:', pendingXdr);
       const signed = await signXDR(pendingXdr);
       let signedXdrString = '';
       if (typeof signed === 'string') {
@@ -443,7 +459,7 @@ ${JSON.stringify(data.result, null, 2)}
       }
       if (!signedXdrString) throw new Error("Signing failed or was cancelled by user");
       // Debug log
-      console.log('[Frontend] Submitting signedXdr:', signedXdrString, typeof signedXdrString);
+      console.log('[XDR Debug] Submitting signedXdr:', signedXdrString, typeof signedXdrString);
       // Add a "submitting" message
       const submittingMessage = { 
         id: `${Date.now()}-${Math.floor(Math.random() * 100000)}`,
@@ -460,6 +476,7 @@ ${JSON.stringify(data.result, null, 2)}
         body: JSON.stringify({ signedXdr: signedXdrString }),
       });
       const data = await res.json();
+      console.log('[XDR Debug] Stellar submit response:', data);
       setPendingTxResult(data);
       if (data.success && data.hash) {
         // Determine protocol for dynamic success message

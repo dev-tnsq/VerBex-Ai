@@ -832,22 +832,32 @@ export class DeFindexService {
       const vaultNameFormatted = vaultName || `${asset} Vault`;
       const vaultSymbol = `${asset.slice(0, 3)}V`;
       
+      // Validate inputs
+      if (!assetAddress || !strategyId) {
+        throw new Error(`Invalid inputs: assetAddress=${assetAddress}, strategyId=${strategyId}`);
+      }
+      
       console.log('[DeFindexService] Calling DeFindex API to create vault');
+      console.log('[DeFindexService] Validated inputs:', { assetAddress, strategyId, asset });
       
       // If we have an initial deposit, use the create-vault-deposit endpoint
       const endpoint = initialDeposit > 0 ? '/factory/create-vault-deposit' : '/factory/create-vault';
       
       const payload = {
         roles: {
-          // Set roles based on input or default to caller
-          "0": userAddress, // Admin role
-          "1": emergencyManager || userAddress, // Emergency role
-          "2": feeReceiver || userAddress // Fee receiver role
+          "0": userAddress, // emergency_manager
+          "1": feeReceiver || userAddress, // fee_receiver  
+          "2": userAddress, // manager
+          "3": userAddress // rebalance_manager
         },
         vault_fee_bps: 1000, // 10% fee in basis points
         assets: [{
-          asset: assetAddress,
-          strategy:strategyId
+          address: assetAddress,
+          strategies: [{
+            address: strategyId,
+            name: `${asset} Strategy`,
+            paused: false
+          }]
         }],
         name_symbol: {
           name: vaultNameFormatted,
@@ -864,6 +874,12 @@ export class DeFindexService {
       }
       
       console.log(`[DeFindexService] API request to ${endpoint}:`, payload);
+      console.log(`[DeFindexService] Strategy object being sent:`, {
+        address: strategyId,
+        name: `${asset} Strategy`,
+        paused: false
+      });
+      console.log(`[DeFindexService] Asset address being sent:`, assetAddress);
       
       // Make API call to create vault
       const response = await this.axiosInstance.post(endpoint, payload, {

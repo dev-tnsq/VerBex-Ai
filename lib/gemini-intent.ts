@@ -540,7 +540,7 @@ const soroswapFunctionDeclarations = [
 const defindexFunctionDeclarations = [
   {
     name: 'createVault',
-    description: 'Create a new vault for a user. This is the first step to start earning yield. If the asset is XLM or USDC, the strategy will be auto-selected.',
+    description: 'Create a new vault for a user. This is the first step to start earning yield. The asset parameter should always be a symbol (e.g., "XLM", "USDC"). If the asset is XLM or USDC, the strategy will be auto-selected.',
     parameters: {
       type: Type.OBJECT,
       properties: {
@@ -548,12 +548,24 @@ const defindexFunctionDeclarations = [
           type: Type.STRING,
           description: 'The user wallet address to create the vault for',
         },
+        asset: {
+          type: Type.STRING,
+          description: 'Asset symbol to create the vault for (e.g., "XLM", "USDC")',
+        },
         strategyId: {
           type: Type.STRING,
           description: 'The ID of the strategy to use (e.g., "XLM-USDC-V1")',
         },
+        vaultName: {
+          type: Type.STRING,
+          description: 'Optional name for the vault (if not provided, will be auto-generated)',
+        },
+        initialDeposit: {
+          type: Type.NUMBER,
+          description: 'Initial deposit amount to fund the vault (optional, default 0)',
+        },
       },
-      required: ['userAddress'],
+      required: ['userAddress', 'asset'],
     },
   },
   {
@@ -962,9 +974,7 @@ export function getUnifiedSystemPrompt(): string {
 - You are the user's trusted DeFi guide for Blend and Soroswap on Stellar. Make every interaction helpful, safe, and empowering.
 
 **SPECIAL INSTRUCTIONS FOR XLM/USDC ON TESTNET:**
-- For XLM or USDC on testnet, always use the following strategy contract addresses for any vault or deposit action:
-  - XLM: CBO77JLVAT54YBRHBY4PSITLILWAAXX5JHPXGBFRW2XUFQKXZ3ZLJ7MJ
-  - USDC: CA57GWLEGS2N5GLSKHQGAA4LKVKFL3MROF2SPFY6CVNDYWH3BUU5VKK7
+- For XLM or USDC on testnet, always use the symbol ("XLM" or "USDC") for the asset parameter when calling createVault or deposit. Do NOT use the contract address for the asset parameter. The backend will resolve the symbol to the contract address as needed.
 - Never use a label like 'low-risk-xlm' or ask the user for risk tolerance for these assets.
 - Always fill in the correct contract address for strategyId automatically.
 - In the function declaration for createVault and deposit, clarify that for XLM/USDC, Gemini must always fill in the correct contract address for strategyId as above.
