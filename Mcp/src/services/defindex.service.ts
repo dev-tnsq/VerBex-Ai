@@ -978,103 +978,98 @@ export class DeFindexService {
     }
   }
 
-  // Deposit using vault API
-  async deposit({ userAddress, vaultAddress, amount, asset }: {
-    userAddress: string;
-    vaultAddress: string;
-    amount: number;
-    asset: string;
-  }): Promise<any> {
-    console.log('[DeFindexService] deposit called with:', { userAddress, vaultAddress, amount, asset });
+// Deposit using vault API
+async deposit({ userAddress, vaultId, amount, asset }: {
+  userAddress: string;
+  vaultId: string;
+  amount: number;
+  asset: string;
+}): Promise<any> {
+  console.log('[DeFindexService] deposit called with:', { userAddress, vaultId, amount, asset });
+  
+  try {
+    // Get vault info to show investment details
+    console.log(`[DeFindexService] Fetching vault info for ${vaultId}`);
+    const vaultResponse = await this.axiosInstance.get(`/vault/${vaultId}`, {
+      params: { network: 'testnet' }
+    });
     
-    try {
-      console.log(`[DeFindexService] Converting ${amount} ${asset} to stroops`);
-      const amountInStroops = this.toStroops(amount, asset);
-      console.log(`[DeFindexService] Amount in stroops: ${amountInStroops}`);
-      
-      // Get vault info to show investment details
-      console.log(`[DeFindexService] Fetching vault info for ${vaultAddress}`);
-      const vaultResponse = await this.axiosInstance.get(`/vault/${vaultAddress}`, {
-        params: { network: 'testnet' }
-      });
-      
-      const vault = vaultResponse.data;
-      
-      if (vault) {
-        console.log(`[DeFindexService] Found vault info:`, vault);
-      } else {
-        console.warn(`[DeFindexService] Vault info not found: ${vaultAddress}`);
-      }
-      
-      // Call the deposit endpoint from the API docs
-      console.log(`[DeFindexService] Calling DeFindex vault API to create deposit transaction`);
-      
-      const depositResponse = await this.axiosInstance.post(`/vault/${vaultAddress}/deposit`, {
-        amounts: [amountInStroops],
-        from: userAddress,
-        invest: true,
-        slippageBps: 50 // 0.5% slippage tolerance
-      }, {
-        params: { network: 'testnet' }
-      });
-      
-      console.log(`[DeFindexService] API deposit response:`, depositResponse.data);
-      
-      if (!depositResponse.data) {
-        throw new Error('API returned empty response for deposit');
-      }
-      
-      // Extract transaction XDR
-      const xdr = depositResponse.data.xdr || depositResponse.data.transaction;
-      
-      if (!xdr) {
-        throw new Error('API response did not contain transaction XDR');
-      }
-      
-      // Get APY info for projected earnings
-      const apyResponse = await this.axiosInstance.get(`/vault/${vaultAddress}/apy`, {
-        params: { network: 'testnet' }
-      });
-      
-      const currentAPY = apyResponse.data?.apy || 10;
-      
-      // Calculate projected earnings
-      const dailyEarnings = amount * currentAPY / 365 / 100;
-      const monthlyEarnings = amount * currentAPY / 12 / 100;
-      const yearlyEarnings = amount * currentAPY / 100;
-      
-      console.log(`[DeFindexService] Deposit transaction prepared with projected APY: ${currentAPY}%`);
-      console.log(`[DeFindexService] Projected earnings: Daily: ${dailyEarnings}, Monthly: ${monthlyEarnings}, Yearly: ${yearlyEarnings}`);
-      
-      return {
-        status: "READY",
-        xdr,
-        message: `Deposit ${amount} ${asset} into vault`,
-        details: {
-          action: "deposit",
-          vaultAddress,
-          amount,
-          asset,
-          amountInStroops,
-          vault: vault,
-          projectedEarnings: {
-            daily: dailyEarnings,
-            monthly: monthlyEarnings,
-            yearly: yearlyEarnings
-          },
-          apiResponse: depositResponse.data
-        }
-      };
-    } catch (error: any) {
-      console.error('[DeFindexService] deposit error:', error?.message);
-      console.error('[DeFindexService] deposit error stack:', error?.stack);
-      return {
-        status: "ERROR",
-        message: error?.message || "Deposit failed",
-        error: error?.response?.data || error?.stack || null
-      };
+    const vault = vaultResponse.data;
+    
+    if (vault) {
+      console.log(`[DeFindexService] Found vault info:`, vault);
+    } else {
+      console.warn(`[DeFindexService] Vault info not found: ${vaultId}`);
     }
+    
+    // Call the deposit endpoint from the API docs
+    console.log(`[DeFindexService] Calling DeFindex vault API to create deposit transaction`);
+    
+    const depositResponse = await this.axiosInstance.post(`/vault/${vaultId}/deposit`, {
+      amounts: [amount],
+      from: userAddress,
+      invest: true,
+      slippageBps: 50 // 0.5% slippage tolerance
+    }, {
+      params: { network: 'testnet' }
+    });
+    
+    console.log(`[DeFindexService] API deposit response:`, depositResponse.data);
+    
+    if (!depositResponse.data) {
+      throw new Error('API returned empty response for deposit');
+    }
+    
+    // Extract transaction XDR
+    const xdr = depositResponse.data.xdr || depositResponse.data.transaction;
+    
+    if (!xdr) {
+      throw new Error('API response did not contain transaction XDR');
+    }
+    
+    // Get APY info for projected earnings
+    const apyResponse = await this.axiosInstance.get(`/vault/${vaultId}/apy`, {
+      params: { network: 'testnet' }
+    });
+    
+    const currentAPY = apyResponse.data?.apy || 10;
+    
+    // Calculate projected earnings
+    const dailyEarnings = amount * currentAPY / 365 / 100;
+    const monthlyEarnings = amount * currentAPY / 12 / 100;
+    const yearlyEarnings = amount * currentAPY / 100;
+    
+    console.log(`[DeFindexService] Deposit transaction prepared with projected APY: ${currentAPY}%`);
+    console.log(`[DeFindexService] Projected earnings: Daily: ${dailyEarnings}, Monthly: ${monthlyEarnings}, Yearly: ${yearlyEarnings}`);
+    
+    return {
+      status: "READY",
+      xdr,
+      message: `Deposit ${amount} ${asset} into vault`,
+      details: {
+        action: "deposit",
+        vaultId,
+        amount,
+        asset,
+        vault: vault,
+        projectedEarnings: {
+          daily: dailyEarnings,
+          monthly: monthlyEarnings,
+          yearly: yearlyEarnings
+        },
+        apiResponse: depositResponse.data
+      }
+    };
+  } catch (error: any) {
+    console.error('[DeFindexService] deposit error:', error?.message);
+    console.error('[DeFindexService] deposit error stack:', error?.stack);
+    return {
+      status: "ERROR",
+      message: error?.message || "Deposit failed",
+      error: error?.response?.data || error?.stack || null
+    };
   }
+}
 
   // Withdraw using vault API
   async withdraw({ userAddress, vaultAddress, amount, asset }: {
