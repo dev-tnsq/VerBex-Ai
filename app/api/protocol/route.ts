@@ -205,11 +205,9 @@ export async function POST(req: NextRequest) {
             claimRewards: blend.claim.bind(blend),
             loadPoolData: ({ poolId, userAddress }) => blend.loadPoolMeta(poolId),
             getTokenBalance: ({ tokenId, userAddress }) => blend.getTokenBalance(resolveAssetAddress(tokenId), userAddress),
-            getFeeStats: blend.getFeeStats.bind(blend),
             getPoolEvents: ({ poolId, version, startLedger }) => blend.getPoolEvents(poolId, version, startLedger),
             getAvailableBlendPools: blend.getAvailableBlendPools.bind(blend),
             loadTokenMetadata: ({ assetId }) => blend.loadTokenMetadata(resolveAssetAddress(assetId)),
-            simulateOperation: ({ operationXdr, userAddress }) => blend.simulateOperation(operationXdr, userAddress),
             loadPool: async ({ poolId }) => { const meta = await blend.loadPoolMeta(poolId); return await blend.loadPool(poolId, meta); },
             loadPoolUser: async ({ poolId, userAddress }) => { const meta = await blend.loadPoolMeta(poolId); const pool = await blend.loadPool(poolId, meta); return await blend.loadPoolUser(pool, userAddress); },
             loadPoolOracle: async ({ poolId }) => { const meta = await blend.loadPoolMeta(poolId); const pool = await blend.loadPool(poolId, meta); return await blend.loadPoolOracle(pool); },
@@ -456,11 +454,10 @@ export async function POST(req: NextRequest) {
           claimRewards: blend.claim.bind(blend),
           loadPoolData: ({ poolId, userAddress }) => blend.loadPoolMeta(poolId),
           getTokenBalance: ({ tokenId, userAddress }) => blend.getTokenBalance(resolveAssetAddress(tokenId), userAddress),
-          getFeeStats: blend.getFeeStats.bind(blend),
           getPoolEvents: ({ poolId, version, startLedger }) => blend.getPoolEvents(poolId, version, startLedger),
           getAvailableBlendPools: blend.getAvailableBlendPools.bind(blend),
           loadTokenMetadata: ({ assetId }) => blend.loadTokenMetadata(resolveAssetAddress(assetId)),
-          simulateOperation: ({ operationXdr, userAddress }) => blend.simulateOperation(operationXdr, userAddress),
+
           // Complex functions with dependency handling
           loadPool: async ({ poolId }) => {
             const meta = await blend.loadPoolMeta(poolId);
