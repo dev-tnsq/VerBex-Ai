@@ -548,7 +548,7 @@ export class BlendService {
     maxPositions: number;
     minCollateral: bigint;
     privateKey?: string;
-  }): Promise<string> {
+  }): Promise<any> { // Changed return type to any for flexibility
     if (!admin || !name || !oracleId || backstopRate === undefined || maxPositions === undefined || minCollateral === undefined) {
       throw new Error('admin, name, oracleId, backstopRate, maxPositions, and minCollateral are required');
     }
@@ -589,45 +589,62 @@ export class BlendService {
   
       // Use provided private key or fall back to AGENT_SECRET
       const signingKey = privateKey || process.env.AGENT_SECRET;
-      if (!signingKey) {
-        throw new Error('Either privateKey parameter or AGENT_SECRET environment variable must be set.');
-      }
-  
-      const signerKeypair = Keypair.fromSecret(signingKey);
+      
+      // Check if we're in web flow (no private key to use)
+      const isWebFlow = !signingKey;
+      
       const network = getNetwork();
       const stellarRpc = new stellarSdk.rpc.Server(network.rpc, network.opts);
   
-      // Load the signer's account
-      const account = await stellarRpc.getAccount(signerKeypair.publicKey());
+      // Load the account (either admin for web flow, or signer for direct flow)
+      const account = isWebFlow 
+        ? await stellarRpc.getAccount(admin)
+        : await stellarRpc.getAccount(Keypair.fromSecret(signingKey).publicKey());
   
       // Prepare transaction parameters
       const txParams = {
         account,
         signerFunction: async (txXdr: string) => {
-          const tx = new Transaction(txXdr, network.passphrase);
-          tx.sign(signerKeypair);
-          return tx.toXDR();
+          if (signingKey) {
+            // Regular flow - sign the transaction
+            const signerKeypair = Keypair.fromSecret(signingKey);
+            const tx = new Transaction(txXdr, network.passphrase);
+            tx.sign(signerKeypair);
+            return tx.toXDR();
+          } else {
+            // Web flow - return unsigned XDR
+            return txXdr;
+          }
         },
         txBuilderOptions: {
           fee: '1000000', // 1 XLM fee for pool creation
           networkPassphrase: network.passphrase,
           timebounds: { minTime: 0, maxTime: Math.floor(Date.now() / 1000) + 300 },
         },
+        privateKey // Pass through to _invokeSorobanOperation
       };
   
       // Deploy the pool using the internal helper method
-      const poolAddress = await this._invokeSorobanOperation(
+      const result = await this._invokeSorobanOperation(
         operation,
         PoolFactoryContractV2.parsers.deployPool,
         txParams
       );
   
-      if (!poolAddress) {
-        throw new Error('Failed to deploy pool: No pool address returned');
+      // Handle results appropriately
+      if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
+        // Web flow - return the unsigned XDR
+        return result;
+      } else if (result && typeof result === 'object' && result.status === 'SUCCESS') {
+        // Direct flow with success - return the pool address/hash
+        return result.result || result.txHash;
+      } else if (typeof result === 'string') {
+        // Simple string result - likely a pool address
+        return result;
       }
   
-      console.log(`Pool successfully created at address: ${poolAddress}`);
-      return poolAddress;
+      // Fallback - return whatever we got
+      return result;
   
     } catch (error: any) {
       console.error('Error creating pool:', error);
@@ -644,37 +661,53 @@ export class BlendService {
       if (error.message?.includes('insufficient funds')) {
         throw new Error('Insufficient funds to create pool. The admin account needs enough XLM to cover transaction fees.');
       }
-  
+
       // Re-throw the original error if it's not a recognized issue
       throw error;
     }
   }
 
-  async addReserve({ admin, poolId, assetId, metadata, privateKey }: any): Promise<string> {
+  async addReserve({ admin, poolId, assetId, metadata, privateKey }: any): Promise<any> {
     if (!admin || !poolId || !assetId || !metadata) {
       throw new Error('admin, poolId, assetId, and metadata are required');
     }
     const network = getNetwork();
     const signingKey = privateKey || process.env.AGENT_SECRET;
-    if (!signingKey) {
-      throw new Error('Either privateKey parameter or AGENT_SECRET environment variable must be set.');
-    }
-    const signerKeypair = Keypair.fromSecret(signingKey);
+    
     const stellarRpc = new stellarSdk.rpc.Server(network.rpc, network.opts);
-    const account = await stellarRpc.getAccount(signerKeypair.publicKey());
+    
+    // Check if we're in web flow (no private key provided)
+    const isWebFlow = !signingKey;
+    let account;
+    
+    // For web flow, use the admin address directly, otherwise get account from private key
+    if (isWebFlow) {
+      account = await stellarRpc.getAccount(admin);
+    } else {
+      const signerKeypair = Keypair.fromSecret(signingKey);
+      account = await stellarRpc.getAccount(signerKeypair.publicKey());
+    }
 
     const txParams = {
       account,
       signerFunction: async (txXdr: string) => {
-        const tx = new Transaction(txXdr, network.passphrase);
-        tx.sign(signerKeypair);
-        return tx.toXDR();
+        // If privateKey is provided, sign; else, return XDR as-is for web flow
+        if (signingKey) {
+          const signerKeypair = Keypair.fromSecret(signingKey);
+          const tx = new Transaction(txXdr, network.passphrase);
+          tx.sign(signerKeypair);
+          return tx.toXDR();
+        } else {
+          // Return the unsigned XDR for web flow
+          return txXdr;
+        }
       },
       txBuilderOptions: {
         fee: '1000000',
         networkPassphrase: network.passphrase,
         timebounds: { minTime: 0, maxTime: Math.floor(Date.now() / 1000) + 300 },
       },
+      privateKey // <-- pass through
     };
 
     const pool = new PoolContractV2(poolId);
@@ -699,53 +732,44 @@ export class BlendService {
     };
 
     // Queue the reserve
-    await this._invokeSorobanOperation(
+    const queueResult = await this._invokeSorobanOperation(
       pool.queueSetReserve(setReserveArgs),
       PoolContractV2.parsers.queueSetReserve,
       txParams
     );
+    
+    // If this is a web flow and we have an unsigned XDR, return it
+    if (queueResult && queueResult.status === 'NEEDS_SIGNATURE') {
+      return queueResult;
+    }
 
+    // If we got here, it means the queue operation was successful
     // Try to set the reserve (may fail if time-lock not reached)
-    let setResult = '';
     try {
-      await this._invokeSorobanOperation(
+      const setResult = await this._invokeSorobanOperation(
         pool.setReserve(assetId),
         PoolContractV2.parsers.setReserve,
         txParams
       );
-      setResult = `Reserve for asset ${assetId} set successfully.`;
+      
+      // Again, if this is a web flow and we have an unsigned XDR, return it
+      if (setResult && setResult.status === 'NEEDS_SIGNATURE') {
+        return setResult;
+      }
+      
+      return {
+        status: 'SUCCESS',
+        txHash: setResult.txHash,
+        message: `Reserve for asset ${assetId} set successfully.`
+      };
     } catch (e) {
-      setResult = `Reserve for asset ${assetId} queued, but not set yet (likely due to time-lock).`;
+      // In case of time-lock not reached, just return the queue result
+      return {
+        status: 'SUCCESS',
+        txHash: queueResult.txHash,
+        message: `Reserve for asset ${assetId} queued, but not set yet (likely due to time-lock).`
+      };
     }
-    return setResult;
-  }
-
-  // Simulate Operation
-  async simulateOperation(operationXdr: string, userAddress: string) {
-    if (!operationXdr || !userAddress) throw new Error('operationXdr and userAddress are required');
-    const network = getNetwork();
-    const operation = xdr.Operation.fromXDR(operationXdr, 'base64');
-    const stellarRpc = new stellarSdk.rpc.Server(network.rpc, network.opts);
-    const account = new stellarSdk.Account(userAddress, '123');
-    const txBuilder = new stellarSdk.TransactionBuilder(account, {
-      networkPassphrase: network.passphrase,
-      fee: stellarSdk.BASE_FEE,
-      timebounds: { minTime: 0, maxTime: Math.floor(Date.now() / 1000) + 5 * 60 * 1000 },
-    }).addOperation(operation);
-    const transaction = txBuilder.build();
-    return await stellarRpc.simulateTransaction(transaction);
-  }
-
-  // Fee Stats
-  async getFeeStats() {
-    const network = getNetwork();
-    const stellarRpc = new stellarSdk.rpc.Server(network.rpc, network.opts);
-    const feeStats = await stellarRpc.getFeeStats();
-    return {
-      low: Math.max(parseInt(feeStats.sorobanInclusionFee.p30), 500).toString(),
-      medium: Math.max(parseInt(feeStats.sorobanInclusionFee.p60), 2000).toString(),
-      high: Math.max(parseInt(feeStats.sorobanInclusionFee.p90), 10000).toString(),
-    };
   }
 
   /**
@@ -759,17 +783,26 @@ export class BlendService {
    *
    * NOTE: The contract method name and arguments may need to be adjusted for the specific NFT contract used.
    */
-  async buyNft({ userAddress, nftContractId, tokenId, price, privateKey }: any): Promise<string> {
+  async buyNft({ userAddress, nftContractId, tokenId, price, privateKey }: any): Promise<any> {
     if (!userAddress || !nftContractId || !tokenId || !price)
       throw new Error('userAddress, nftContractId, tokenId, and price are required');
     const network = getNetwork();
     const signingKey = privateKey || process.env.AGENT_SECRET;
-    if (!signingKey) {
+    
+    // Check if we're in web flow (no private key provided)
+    const isWebFlow = !signingKey;
+    let account;
+    
+    // For web flow, use the userAddress directly, otherwise get account from private key
+    const stellarRpc = new stellarSdk.rpc.Server(network.rpc, network.opts);
+    if (isWebFlow) {
+      account = await stellarRpc.getAccount(userAddress);
+    } else if (signingKey) {
+      const signerKeypair = Keypair.fromSecret(signingKey);
+      account = await stellarRpc.getAccount(signerKeypair.publicKey());
+    } else {
       throw new Error('Either privateKey parameter or AGENT_SECRET environment variable must be set.');
     }
-    const signerKeypair = Keypair.fromSecret(signingKey);
-    const stellarRpc = new stellarSdk.rpc.Server(network.rpc, network.opts);
-    const account = await stellarRpc.getAccount(signerKeypair.publicKey());
 
     // Build the contract invocation operation (assume 'buy' method)
     // You may need to adjust the method name and argument order for your NFT contract
@@ -790,24 +823,33 @@ export class BlendService {
     const txParams = {
       account,
       signerFunction: async (txXdr: string) => {
-        const tx = new Transaction(txXdr, network.passphrase);
-        tx.sign(signerKeypair);
-        return tx.toXDR();
+        // If privateKey is provided, sign; else, return XDR as-is for web flow
+        if (signingKey) {
+          const signerKeypair = Keypair.fromSecret(signingKey);
+          const tx = new Transaction(txXdr, network.passphrase);
+          tx.sign(signerKeypair);
+          return tx.toXDR();
+        } else {
+          // Return the unsigned XDR for web flow
+          return txXdr;
+        }
       },
       txBuilderOptions: {
         fee: '100000',
         networkPassphrase: network.passphrase,
         timebounds: { minTime: 0, maxTime: Math.floor(Date.now() / 1000) + 300 },
       },
+      privateKey // <-- pass through
     };
 
     // Call _invokeSorobanOperation
-    const txHash = await this._invokeSorobanOperation(
+    const result = await this._invokeSorobanOperation(
       op.toXDR('base64'),
       () => '',
       txParams
     );
-    return txHash as string;
+    
+    return result;
   }
 
   // --- Internal helper for tx build/sign/submit ---
@@ -1264,4 +1306,4 @@ export class BlendService {
       };
     }
   }
-} 
+}

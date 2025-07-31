@@ -3,6 +3,9 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { BlendService } from './services/blend.service.js';
 import { StellarService } from './services/stellar.service.js';
+import { SoroswapService } from './services/soroswap.service.js';
+import { DeFindexService } from './services/defindex.service.js';
+import { UnifiedPortfolioService } from './services/portfolio.service.js';
 import { PoolV1, PoolV2 } from '@blend-capital/blend-sdk';
 import dotenv from 'dotenv';
 
@@ -38,6 +41,9 @@ const server = new McpServer({
 
 const blendService = new BlendService();
 const stellarService = new StellarService();
+const soroswapService = new SoroswapService();
+const defindexService = new DeFindexService();
+const portfolioService = new UnifiedPortfolioService();
 
 // 2. Register tools with explicit schemas
 
@@ -91,18 +97,6 @@ server.registerTool(
     }
 );
 
-server.registerTool(
-    "getFeeStats",
-    {
-        title: "Get Fee Stats",
-        description: "Gets the current Soroban network fee statistics.",
-        inputSchema: {},
-    },
-    async () => {
-        const feeStats = await blendService.getFeeStats();
-        return { content: [{ type: 'text', text: JSON.stringify(feeStats, jsonReplacer, 2) }] };
-    }
-);
 
 server.registerTool(
   'getPoolEvents',
@@ -151,21 +145,6 @@ server.registerTool(
   }
 );
 
-server.registerTool(
-  'simulateOperation',
-  {
-    title: 'Simulate Operation',
-    description: 'Simulates a transaction operation without submitting it to the network.',
-    inputSchema: {
-      operationXdr: z.string().describe('The base64-encoded XDR of the operation to simulate.'),
-      userAddress: z.string().describe('The public key of the user address to use as the source for the simulation.'),
-    },
-  },
-  async ({ operationXdr, userAddress }: { operationXdr: string; userAddress: string }) => {
-    const simulationResult = await blendService.simulateOperation(operationXdr, userAddress);
-    return { content: [{ type: 'text', text: JSON.stringify(simulationResult, jsonReplacer, 2) }] };
-  }
-);
 
 // --- WRITE/TRANSACTION TOOLS ---
 
@@ -185,8 +164,16 @@ server.registerTool('lend', {
     description: "Submits a transaction to lend (supply collateral) to a pool.",
     inputSchema: transactionInputSchema,
 }, async (params: TransactionParams) => {
-    const txHash = await blendService.lend(params);
-    return { content: [{ type: 'text', text: `Lend transaction submitted successfully. Hash: ${txHash}` }] };
+    const result = await blendService.lend(params);
+    if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+    } else if (result && typeof result === 'object' && result.txHash) {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    } else if (typeof result === 'string' && result.length > 40) {
+        // Assume it's an XDR
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: `Lend transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
 });
 
 server.registerTool('withdraw', {
@@ -194,8 +181,16 @@ server.registerTool('withdraw', {
     description: "Submits a transaction to withdraw assets from a pool.",
     inputSchema: transactionInputSchema,
 }, async (params: TransactionParams) => {
-    const txHash = await blendService.withdraw(params);
-    return { content: [{ type: 'text', text: `Withdraw transaction submitted successfully. Hash: ${txHash}` }] };
+    const result = await blendService.withdraw(params);
+    if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+    } else if (result && typeof result === 'object' && result.txHash) {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    } else if (typeof result === 'string' && result.length > 40) {
+        // Assume it's an XDR
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: `Withdraw transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
 });
 
 server.registerTool('borrow', {
@@ -203,8 +198,16 @@ server.registerTool('borrow', {
     description: "Submits a transaction to borrow assets from a pool.",
     inputSchema: transactionInputSchema,
 }, async (params: TransactionParams) => {
-    const txHash = await blendService.borrow(params);
-    return { content: [{ type: 'text', text: `Borrow transaction submitted successfully. Hash: ${txHash}` }] };
+    const result = await blendService.borrow(params);
+    if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+    } else if (result && typeof result === 'object' && result.txHash) {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    } else if (typeof result === 'string' && result.length > 40) {
+        // Assume it's an XDR
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: `Borrow transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
 });
 
 server.registerTool('repay', {
@@ -212,8 +215,16 @@ server.registerTool('repay', {
     description: "Submits a transaction to repay borrowed assets to a pool.",
     inputSchema: transactionInputSchema,
 }, async (params: TransactionParams) => {
-    const txHash = await blendService.repay(params);
-    return { content: [{ type: 'text', text: `Repay transaction submitted successfully. Hash: ${txHash}` }] };
+    const result = await blendService.repay(params);
+    if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+    } else if (result && typeof result === 'object' && result.txHash) {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    } else if (typeof result === 'string' && result.length > 40) {
+        // Assume it's an XDR
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: `Repay transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
 });
 
 const claimRewardsSchema = {
@@ -230,8 +241,16 @@ server.registerTool('claimRewards', {
     description: "Submits a transaction to claim available rewards from a pool.",
     inputSchema: claimRewardsSchema,
 }, async (params: ClaimRewardsParams) => {
-    const txHash = await blendService.claim(params);
-    return { content: [{ type: 'text', text: `Claim transaction submitted successfully. Hash: ${txHash}` }] };
+    const result = await blendService.claim(params);
+    if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+    } else if (result && typeof result === 'object' && result.txHash) {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    } else if (typeof result === 'string' && result.length > 40) {
+        // Assume it's an XDR
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: `Claim rewards transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
 });
 
 const createPoolInputSchema = {
@@ -254,11 +273,19 @@ server.registerTool(
     inputSchema: createPoolInputSchema,
   },
   async (params: CreatePoolParams) => {
-    const txHash = await blendService.createPool({
+    const result = await blendService.createPool({
       ...params,
       minCollateral: BigInt(params.minCollateral),
     });
-    return { content: [{ type: 'text', text: `Pool creation transaction submitted successfully. Hash: ${txHash}` }] };
+    if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+    } else if (result && typeof result === 'object' && result.txHash) {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    } else if (typeof result === 'string' && result.length > 40) {
+        // Assume it's an XDR
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: `Pool creation transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
   }
 );
 
@@ -297,8 +324,16 @@ server.registerTool(
     inputSchema: addReserveInputSchema,
   },
   async (params: AddReserveParams) => {
-    const txHash = await blendService.addReserve(params);
-    return { content: [{ type: 'text', text: `Add reserve transaction submitted successfully. Hash: ${txHash}` }] };
+    const result = await blendService.addReserve(params);
+    if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+    } else if (result && typeof result === 'object' && result.txHash) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    } else if (typeof result === 'string' && result.length > 40) {
+      // Assume it's an XDR
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: `Add reserve transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
   }
 );
 
@@ -316,19 +351,346 @@ server.registerTool(
     },
   },
   async ({ userAddress, nftContractId, tokenId, price, privateKey }) => {
-    const txHash = await blendService.buyNft({ userAddress, nftContractId, tokenId, price, privateKey });
-    return { content: [{ type: 'text', text: `NFT purchase transaction submitted. Hash: ${txHash}` }] };
+    const result = await blendService.buyNft({ userAddress, nftContractId, tokenId, price, privateKey });
+    if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+    } else if (result && typeof result === 'object' && result.txHash) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    } else if (typeof result === 'string' && result.length > 40) {
+      // Assume it's an XDR
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: `NFT purchase transaction submitted. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
   }
 );
 
-// 3. Connect to a transport and run the server
-async function run() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error('Blend Protocol MCP Server connected via stdio and ready.');
-}
+// ===================== SOROSWAP SERVICE MCP FUNCTIONS =====================
 
-run().catch((err) => {
-  console.error('Failed to run MCP server:', err);
-  process.exit(1);
-});
+// --- READ-ONLY SOROSWAP TOOLS ---
+
+server.registerTool(
+  'getAvailableSoroswapPools',
+  {
+    title: 'Get Available Soroswap Pools',
+    description: 'Returns a list of all available Soroswap liquidity pools.',
+    inputSchema: {},
+  },
+  async () => {
+    const pools = await soroswapService.getAvailableSoroswapPools();
+    return { content: [{ type: 'text', text: JSON.stringify(pools, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'getUserLPPositions',
+  {
+    title: 'Get User LP Positions',
+    description: 'Returns all liquidity positions for a user on Soroswap.',
+    inputSchema: {
+      userAddress: z.string().describe('The public key of the user.'),
+    },
+  },
+  async ({ userAddress }: { userAddress: string }) => {
+    const positions = await soroswapService.getUserLPPositions({ userAddress });
+    return { content: [{ type: 'text', text: JSON.stringify(positions, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'getPrice',
+  {
+    title: 'Get Asset Price',
+    description: 'Returns the price of the specified asset.',
+    inputSchema: {
+      asset: z.string().describe('The asset contract address or symbol to get price for.'),
+      referenceCurrency: z.string().optional().describe('Optional reference currency (default: USD).'),
+    },
+  },
+  async ({ asset, referenceCurrency }: { asset: string; referenceCurrency?: string }) => {
+    const price = await soroswapService.getPrice({ asset, referenceCurrency });
+    return { content: [{ type: 'text', text: JSON.stringify(price, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'getAssetList',
+  {
+    title: 'Get Asset List',
+    description: 'Returns a list of all available assets on Soroswap.',
+    inputSchema: {},
+  },
+  async () => {
+    const assets = await soroswapService.getAssetList();
+    return { content: [{ type: 'text', text: JSON.stringify(assets, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'getUserTokenBalances',
+  {
+    title: 'Get User Token Balances',
+    description: 'Returns all token balances for a user on Soroswap.',
+    inputSchema: {
+      userAddress: z.string().describe('The public key of the user.'),
+    },
+  },
+  async ({ userAddress }: { userAddress: string }) => {
+    const balances = await soroswapService.getUserTokenBalances(userAddress);
+    return { content: [{ type: 'text', text: JSON.stringify(balances, jsonReplacer, 2) }] };
+  }
+);
+
+// --- TRANSACTION SOROSWAP TOOLS ---
+
+server.registerTool(
+  'swap',
+  {
+    title: 'Swap Assets',
+    description: 'Executes a swap between two assets on Soroswap.',
+    inputSchema: {
+      userAddress: z.string().describe('The public key of the user performing the swap.'),
+      fromAsset: z.string().describe('The contract address of the asset to swap from.'),
+      toAsset: z.string().describe('The contract address of the asset to swap to.'),
+      amount: z.number().describe('The amount to swap.'),
+      maxSlippage: z.number().optional().describe('The maximum slippage percentage allowed (default: 0.5).'),
+      routeType: z.enum(['amm', 'aggregator']).optional().describe('The route type to use for the swap.'),
+    },
+  },
+  async (params) => {
+    const result = await soroswapService.swap(params);
+    if (result.xdr) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.xdr }, null, 2) }] };
+    } else if (result.txHash) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: JSON.stringify(result, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'addLiquidity',
+  {
+    title: 'Add Liquidity',
+    description: 'Adds liquidity to a Soroswap pool.',
+    inputSchema: {
+      userAddress: z.string().describe('The public key of the user adding liquidity.'),
+      tokenA: z.string().describe('The contract address of the first token.'),
+      tokenB: z.string().describe('The contract address of the second token.'),
+      amountA: z.number().describe('The amount of the first token to add.'),
+      amountB: z.number().describe('The amount of the second token to add.'),
+      autoBalance: z.boolean().optional().describe('Whether to automatically balance the amounts according to the pool ratio.'),
+    },
+  },
+  async (params) => {
+    const result = await soroswapService.addLiquidity(params);
+    if (result.xdr) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.xdr }, null, 2) }] };
+    } else if (result.txHash) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: JSON.stringify(result, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'removeLiquidity',
+  {
+    title: 'Remove Liquidity',
+    description: 'Removes liquidity from a Soroswap pool.',
+    inputSchema: {
+      userAddress: z.string().describe('The public key of the user removing liquidity.'),
+      poolId: z.string().describe('The contract ID of the pool.'),
+      lpAmount: z.number().describe('The amount of LP tokens to remove.'),
+    },
+  },
+  async (params) => {
+    const result = await soroswapService.removeLiquidity(params);
+    if (result.xdr) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.xdr }, null, 2) }] };
+    } else if (result.txHash) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: JSON.stringify(result, jsonReplacer, 2) }] };
+  }
+);
+
+// ===================== DEFINDEX SERVICE MCP FUNCTIONS =====================
+
+// --- READ-ONLY DEFINDEX TOOLS ---
+
+server.registerTool(
+  'getAvailableVaults',
+  {
+    title: 'Get Available Vaults',
+    description: 'Returns a list of all available DeFindex vaults.',
+    inputSchema: {
+      userAddress: z.string().optional().describe('Optional user address to filter vaults by ownership.'),
+    },
+  },
+  async ({ userAddress }: { userAddress?: string }) => {
+    const vaults = await defindexService.getAvailableVaults();
+    return { content: [{ type: 'text', text: JSON.stringify(vaults, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'getAvailableStrategies',
+  {
+    title: 'Get Available Strategies',
+    description: 'Returns a list of all available DeFindex strategies.',
+    inputSchema: {},
+  },
+  async () => {
+    const strategies = await defindexService.getAvailableStrategies();
+    return { content: [{ type: 'text', text: JSON.stringify(strategies, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'getUserPositions',
+  {
+    title: 'Get User Positions',
+    description: 'Returns all DeFindex positions for a user.',
+    inputSchema: {
+      userAddress: z.string().describe('The public key of the user.'),
+    },
+  },
+  async ({ userAddress }: { userAddress: string }) => {
+    const positions = await defindexService.getUserPositions({ userAddress });
+    return { content: [{ type: 'text', text: JSON.stringify(positions, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'getVaultAnalytics',
+  {
+    title: 'Get Vault Analytics',
+    description: 'Returns analytics for a specific DeFindex vault.',
+    inputSchema: {
+      vaultAddress: z.string().describe('The contract ID of the vault.'),
+    },
+  },
+  async ({ vaultAddress }: { vaultAddress: string }) => {
+    const analytics = await defindexService.getVaultAnalytics({ vaultAddress });
+    return { content: [{ type: 'text', text: JSON.stringify(analytics, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'getYieldOpportunities',
+  {
+    title: 'Get Yield Opportunities',
+    description: 'Returns yield opportunities across DeFindex.',
+    inputSchema: {
+      userAddress: z.string().describe('The user wallet address.'),
+      riskTolerance: z.enum(['low', 'medium', 'high']).optional().describe('Optional risk tolerance level (low, medium, high).'),
+    },
+  },
+  async ({ userAddress, riskTolerance }: { userAddress: string; riskTolerance?: 'low' | 'medium' | 'high' }) => {
+    const opportunities = await defindexService.getYieldOpportunities({ userAddress, riskTolerance });
+    return { content: [{ type: 'text', text: JSON.stringify(opportunities, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'getBalance',
+  {
+    title: 'Get Vault Balance',
+    description: 'Returns the balance of a user in a specific DeFindex vault.',
+    inputSchema: {
+      userAddress: z.string().describe('The public key of the user.'),
+      vaultAddress: z.string().describe('The contract ID of the vault.'),
+    },
+  },
+  async (params) => {
+    const balance = await defindexService.getBalance(params);
+    return { content: [{ type: 'text', text: JSON.stringify(balance, jsonReplacer, 2) }] };
+  }
+);
+
+// --- TRANSACTION DEFINDEX TOOLS ---
+
+server.registerTool(
+  'createVault',
+  {
+    title: 'Create Vault',
+    description: 'Creates a new DeFindex vault.',
+    inputSchema: {
+      userAddress: z.string().describe('The public key of the user creating the vault.'),
+      asset: z.string().describe('The asset symbol or contract ID for the vault.'),
+      strategyId: z.string().describe('The strategy ID to use for the vault.'),
+      initialDeposit: z.number().optional().describe('Optional initial deposit amount.'),
+      vaultName: z.string().optional().describe('Optional custom name for the vault.'),
+    },
+  },
+  async (params) => {
+    const result = await defindexService.createVault(params);
+    if (result.xdr) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.xdr }, null, 2) }] };
+    } else if (result.txHash) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: JSON.stringify(result, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'deposit',
+  {
+    title: 'Deposit to Vault',
+    description: 'Deposits assets into a DeFindex vault.',
+    inputSchema: {
+      userAddress: z.string().describe('The public key of the user making the deposit.'),
+      vaultId: z.string().describe('The contract ID of the vault.'),
+      amount: z.number().describe('The amount to deposit.'),
+      asset: z.string().describe('The asset symbol or contract ID to deposit.'),
+    },
+  },
+  async (params) => {
+    const result = await defindexService.deposit(params);
+    if (result.xdr) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.xdr }, null, 2) }] };
+    } else if (result.txHash) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: JSON.stringify(result, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'withdraw',
+  {
+    title: 'Withdraw from Vault',
+    description: 'Withdraws assets from a DeFindex vault.',
+    inputSchema: {
+      userAddress: z.string().describe('The public key of the user making the withdrawal.'),
+      vaultAddress: z.string().describe('The contract ID of the vault.'),
+      amount: z.number().describe('The amount to withdraw.'),
+      asset: z.string().describe('The asset symbol or contract ID to withdraw.'),
+    },
+  },
+  async (params) => {
+    const result = await defindexService.withdraw(params);
+    if (result.xdr) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.xdr }, null, 2) }] };
+    } else if (result.txHash) {
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
+    }
+    return { content: [{ type: 'text', text: JSON.stringify(result, jsonReplacer, 2) }] };
+  }
+);
+
+server.registerTool(
+  'sendTransaction',
+  {
+    title: 'Send DeFindex Transaction',
+    description: 'Sends a signed DeFindex transaction to the network.',
+    inputSchema: {
+      signedXdr: z.string().describe('The signed transaction XDR.'),
+    },
+  },
+  async ({ signedXdr }: { signedXdr: string }) => {
+    const result = await defindexService.sendTransaction({ signedXdr });
+    return { content: [{ type: 'text', text: JSON.stringify(result, jsonReplacer, 2) }] };
+  }
+);
