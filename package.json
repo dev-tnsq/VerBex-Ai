@@ -8,7 +8,9 @@
     "lint": "next lint",
     "start": "next start",
     "test-integration": "node test-integration.js",
-    "setup": "cp .env.example .env && echo '✅ .env file created! Please add your GOOGLE_GENERATIVE_AI_API_KEY'"
+    "setup": "cp .env.example .env && echo '✅ .env file created! Please add your GOOGLE_GENERATIVE_AI_API_KEY'",
+    "start-mcp": "defi-mcp-stellar",
+    "start-mcp-debug": "DEBUG=1 defi-mcp-stellar"
   },
   "dependencies": {
     "@ai-sdk/google": "latest",

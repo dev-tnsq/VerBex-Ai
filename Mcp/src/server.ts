@@ -33,10 +33,10 @@ function jsonReplacer(key: any, value: any) {
 
 // 1. Create an MCP server instance
 const server = new McpServer({
-  name: 'blend-protocol-server',
+  name: 'protocol-server',
   version: '2.0.0',
-  title: 'Blend Protocol MCP',
-  description: 'A server for interacting with the Blend DeFi Protocol on the Stellar network.',
+  title: 'stellar Protocol MCP',
+  description: 'A server for interacting with the DeFi Protocol on the Stellar network.',
 });
 
 const blendService = new BlendService();
@@ -176,7 +176,7 @@ server.registerTool('lend', {
     return { content: [{ type: 'text', text: `Lend transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
 });
 
-server.registerTool('withdraw', {
+server.registerTool('withdraw-pool', {
     title: "Withdraw from Pool",
     description: "Submits a transaction to withdraw assets from a pool.",
     inputSchema: transactionInputSchema,
@@ -658,7 +658,7 @@ server.registerTool(
 );
 
 server.registerTool(
-  'withdraw',
+  'withdraw-vault',
   {
     title: 'Withdraw from Vault',
     description: 'Withdraws assets from a DeFindex vault.',
@@ -680,17 +680,16 @@ server.registerTool(
   }
 );
 
-server.registerTool(
-  'sendTransaction',
-  {
-    title: 'Send DeFindex Transaction',
-    description: 'Sends a signed DeFindex transaction to the network.',
-    inputSchema: {
-      signedXdr: z.string().describe('The signed transaction XDR.'),
-    },
-  },
-  async ({ signedXdr }: { signedXdr: string }) => {
-    const result = await defindexService.sendTransaction({ signedXdr });
-    return { content: [{ type: 'text', text: JSON.stringify(result, jsonReplacer, 2) }] };
-  }
-);
+
+
+// 3. Connect to a transport and run the server
+async function run() {
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  console.error('Blend Protocol MCP Server connected via stdio and ready.');
+}
+
+run().catch((err) => {
+  console.error('Failed to run MCP server:', err);
+  process.exit(1);
+});
