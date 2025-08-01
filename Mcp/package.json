@@ -22,6 +22,7 @@
     "express": "^4.18.2",
     "helmet": "^7.0.0",
     "joi": "^17.9.2",
+    "passkey-kit": "^0.10.24",
     "stellar-hd-wallet": "^1.0.2",
     "urijs": "^1.19.11",
     "winston": "^3.8.2",

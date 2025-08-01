@@ -1,6 +1,6 @@
-import { SoroswapService } from './soroswap.service';
-import { DeFindexService } from './defindex.service';
-import { BlendService } from './blend.service';
+import { SoroswapService } from './soroswap.service.js';
+import { DeFindexService } from './defindex.service.js';
+import { BlendService } from './blend.service.js';
 
 const ASSET_ADDRESSES: Record<string, string> = {
   'XLM': 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC',
@@ -1072,6 +1072,36 @@ export class UnifiedPortfolioService {
         highPriority: opportunities.filter(o => o.priority === 'high').length,
         potentialGains: opportunities.reduce((sum, o) => sum + (o.potentialGain || 0), 0)
       }
+    };
+  }
+
+  /**
+   * Get unified portfolio data across all protocols
+   */
+  async getUnifiedPortfolio(userAddress: string) {
+    return {
+      totalValue: 0,
+      positions: [],
+      protocols: {
+        blend: [],
+        soroswap: [],
+        defindex: []
+      }
+    };
+  }
+
+  /**
+   * Get portfolio analytics
+   */
+  async getPortfolioAnalytics(userAddress: string) {
+    return {
+      performance: {
+        dailyChange: 0,
+        weeklyChange: 0,
+        monthlyChange: 0
+      },
+      allocation: {},
+      riskMetrics: {}
     };
   }
 }
