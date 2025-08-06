@@ -1,538 +1,201 @@
-# 🚀 Verbex AI - Agentic DeFi Assistant & MCP Protocol
+# 🚀 Verbex AI - Agentic DeFi Assistant
 
-> **Revolutionizing DeFi on Stellar with AI-Powered Portfolio Management & Multi-Protocol Integration**
-
-[![Deploy on Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/VerbexAi)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Stellar](https://img.shields.io/badge/Stellar-Testnet-blue.svg)](https://stellar.org)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org)
+> **AI-powered DeFi assistant with MCP integration for Stellar blockchain**
 
 ## 🎯 Project Overview
 
-Verbex AI is a cutting-edge DeFi platform that combines **AI-powered conversational assistance** with **Model Context Protocol (MCP) integration** to provide seamless access to Stellar's DeFi ecosystem. Our platform integrates **Blend Protocol** (lending/borrowing), **Soroswap** (DEX), and **DeFindex** (yield farming) into a unified, intelligent interface.
+Verbex AI transforms complex DeFi operations into simple conversations. We provide **two interfaces**:
 
-### 🌟 Key Features
+1. **Web Assistant** - Conversational AI powered by Google Gemini
+2. **MCP Server** - Universal AI gateway for any AI assistant
 
-- **🤖 AI-Powered DeFi Assistant**: Conversational interface powered by Google Gemini
-- **🔗 MCP Integration**: Direct blockchain interaction through Model Context Protocol
-- **💼 Multi-Protocol Portfolio**: Unified view across Blend, Soroswap, and DeFindex
-- **🔐 Secure Wallet Integration**: Freighter wallet with passkey authentication
-- **📊 Real-Time Analytics**: Portfolio health, yield optimization, and risk assessment
-- **🎨 Retro-Futuristic UI**: Modern design with nostalgic gaming aesthetics
-- **⚡ Advanced Transaction Flow**: Smart signing URLs and transaction management
+### 🌟 What We Do
 
-## 🏗️ Architecture
+- **Multi-Protocol DeFi**: Blend (lending), Soroswap (DEX), DeFindex (yield farming)
+- **AI-Powered Conversations**: Execute complex strategies through natural language
+- **Real-Time Portfolio Management**: Cross-protocol analytics and optimization
+- **Secure Transactions**: Wallet integration with signing URLs
+- **Advanced Risk Management**: Portfolio health monitoring and alerts
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   MCP Server    │    │   Blockchain    │
-│   (Next.js)     │◄──►│   (Node.js)     │◄──►│   (Stellar)     │
-│                 │    │                 │    │                 │
-│ • Gemini Chat   │    │ • Blend Service │    │ • Blend Protocol│
-│ • Wallet Connect│    │ • Soroswap Svc  │    │ • Soroswap DEX  │
-│ • Portfolio UI  │    │ • DeFindex Svc  │    │ • DeFindex Vault│
-│ • Transaction   │    │ • Portfolio Svc │    │ • Smart Contracts│
-│   Signing       │    │ • Stellar Svc   │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+## 🔗 Live Demo & Links
 
-## 🚀 Quick Start
+### **🌐 Web Assistant**
+**URL**: [https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app](https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app)
 
-### Prerequisites
+**Features**:
+- Chat with AI about your DeFi goals
+- Real-time portfolio analytics
+- Secure wallet integration
+- Transaction signing interface
 
-- Node.js 18+ 
-- Yarn or npm
-- Freighter Wallet (Stellar)
-- Stellar Testnet account
+### **🔗 MCP Server**
+**URL**: [https://verbex-ai.onrender.com/sse](https://verbex-ai.onrender.com/sse)
 
-### Installation
+**Features**:
+- 50+ DeFi tools accessible to any AI
+- Works with Claude, ChatGPT, or custom AI
+- Real-time blockchain data
+- Secure transaction execution
 
+### **📚 GitHub**
+**Repository**: [https://github.com/your-username/VerbexAi](https://github.com/your-username/VerbexAi)
+
+## 🚀 Quick Setup
+
+### **Web Assistant Setup**
 ```bash
-# Clone the repository
 git clone https://github.com/your-username/VerbexAi.git
 cd VerbexAi
-
-# Install dependencies
 yarn install
-
-# Install MCP dependencies
-cd Mcp && yarn install && cd ..
-
-# Set up environment variables
-cp .env.example .env.local
-# Edit .env.local with your configuration
-
-# Generate Prisma client and run migrations
-npx prisma generate
-npx prisma migrate deploy
-
-# Start the development server
 yarn dev
 ```
 
-### Environment Variables
+### **MCP Integration**
+Add to your AI assistant configuration:
 
-```env
-# Database
-DATABASE_URL="file:./dev.db"
-
-# Stellar Configuration
-STELLAR_NETWORK="testnet"
-STELLAR_RPC_URL="https://soroban-testnet.stellar.org"
-
-# MCP Server
-MCP_SERVER_URL="http://localhost:3001"
-
-# Gemini AI
-GEMINI_API_KEY="your-gemini-api-key"
-
-# Soroswap API
-SOROSWAP_API_KEY="your-soroswap-api-key"
-SOROSWAP_API_BASE="https://soroswap-api-staging-436722401508.us-central1.run.app"
-```
-
-## 🎮 Usage Guide
-
-### 1. AI-Powered DeFi Assistant
-
-Start a conversation with our Gemini-powered assistant:
-
-```bash
-# Ask about your portfolio
-"Show my complete DeFi portfolio across Blend and Soroswap"
-
-# Request complex operations
-"Swap 100 XLM to USDC with best route optimization"
-
-# Get yield recommendations
-"Find the best yield opportunities for my risk tolerance"
-
-# Execute multi-step operations
-"Lend 500 USDC to Blend pool, then add 200 XLM to Soroswap liquidity"
-```
-
-### 2. MCP Integration
-
-Use our MCP server for direct blockchain interactions:
-
-```bash
-# Start MCP server
-cd Mcp && yarn start
-
-# Available MCP Functions:
-# loadPoolData
-# getTokenBalance
-# getPoolEvents
-# loadBackstopData
-# load TokenMetadata
-# lend
-# withdraw-pool
-# borrow
-# repay
-# claimRewards createPool
-# addReserve
-# buyNft
-# getAvailableSoroswapPools
-# getUserLPPositions
-# getPrice
-# getAssetList
-# getUserTokenBalances
-# swap
-# addLiquidity
-# removeLiquidity
-# getAvailableVaults
-# getAvailableStrategies
-# getUserPositions
-# getVaultAnalytics
-# getYieldOpportunities
-# getBalance
-# createVault
-# deposit
-# withdraw-vault
-```
-
-### 3. Advanced Transaction Flow
-
-Our platform provides a sophisticated transaction signing experience:
-
-1. **AI Assistant** generates transaction parameters
-2. **MCP Server** creates unsigned XDR
-3. **Signing URL** directs to dedicated signing page
-4. **Wallet Integration** handles secure signing
-5. **Transaction Submission** to Stellar network
-6. **Result Reporting** back to AI assistant
-
-## 🔧 Complex Features & Capabilities
-
-### Multi-Protocol Portfolio Management
-
-```typescript
-// Unified portfolio across all protocols
-const portfolio = {
-  blend: {
-    positions: [...],
-    totalValue: "1,250 USDC",
-    healthScore: 85
-  },
-  soroswap: {
-    lpPositions: [...],
-    totalValue: "2,100 XLM",
-    impermanentLoss: "2.3%"
-  },
-  defindex: {
-    vaults: [...],
-    totalValue: "850 USDC",
-    apy: "12.5%"
+```json
+{
+  "mcpServers": {
+    "verbex-ai": {
+      "url": "https://verbex-ai.onrender.com/sse"
+    }
   }
 }
 ```
 
-### Advanced Yield Optimization
+## 🛠️ Available Functions
 
-- **Cross-Protocol Arbitrage**: Automatically identify and execute profitable opportunities
-- **Risk-Adjusted Returns**: Calculate optimal allocations based on risk tolerance
-- **Impermanent Loss Protection**: Monitor and rebalance LP positions
-- **Liquidation Prevention**: Real-time monitoring of lending positions
+### **Blend Protocol (Lending/Borrowing)**
+- `lend` - Supply collateral to lending pools
+- `withdraw-pool` - Withdraw assets from pools
+- `borrow` - Borrow assets from pools
+- `repay` - Repay borrowed assets
+- `claimRewards` - Claim available rewards
+- `createPool` - Deploy new lending pools
+- `addReserve` - Add asset reserves to pools
+- `loadPoolData` - Load comprehensive pool data
+- `getPoolEvents` - Get historical pool events
+- `loadBackstopData` - Load backstop contract data
+- `getTokenBalance` - Get user token balances
 
-### Complex Transaction Sequences
+### **Soroswap (DEX)**
+- `swap` - Execute token swaps
+- `addLiquidity` - Add liquidity to pools
+- `removeLiquidity` - Remove liquidity from pools
+- `getAvailableSoroswapPools` - List available pools
+- `getUserLPPositions` - Get user LP positions
+- `getPrice` - Get asset prices
+- `getAssetList` - List available assets
+- `getUserTokenBalances` - Get user token balances
 
-```typescript
-// Example: Multi-step DeFi strategy
-const strategy = [
-  "1. Swap 500 XLM to USDC (Soroswap)",
-  "2. Lend 300 USDC to Blend pool",
-  "3. Add 200 USDC to Soroswap LP",
-  "4. Create DeFindex vault with remaining USDC"
-];
+### **DeFindex (Yield Farming)**
+- `createVault` - Create yield vaults
+- `deposit` - Deposit assets into vaults
+- `withdraw-vault` - Withdraw assets from vaults
+- `getAvailableVaults` - List available vaults
+- `getAvailableStrategies` - List yield strategies
+- `getUserPositions` - Get user vault positions
+- `getVaultAnalytics` - Get vault performance data
+- `getYieldOpportunities` - Find yield opportunities
+
+### **Portfolio Management**
+- `getUserTokenBalances` - Cross-protocol token balances
+- `getUserLPPositions` - Liquidity pool positions
+- `getUserPositions` - DeFindex vault positions
+- `getBalance` - Protocol-specific balances
+
+## 🚀 Advanced Complex Functions
+
+### **Portfolio Analysis & Optimization**
+```
+loadPoolData → getUserTokenBalances → getYieldOpportunities → AI analyzes → recommend strategy
+"Analyze my portfolio and suggest the best yield farming strategy"
 ```
 
-### Real-Time Analytics & Alerts
-
-- **Portfolio Health Monitoring**: Track position health across protocols
-- **Price Impact Analysis**: Calculate optimal trade sizes
-- **Gas Fee Optimization**: Route transactions for minimal costs
-- **Risk Assessment**: Real-time risk scoring and alerts
-
-## 🚀 Advanced Workflows & Use Cases
-
-### 1. **Portfolio Analysis & Optimization Workflow**
-
-```bash
-# Complete portfolio health check
-"Analyze my entire DeFi portfolio across all protocols"
-
-# Workflow: loadPoolData → getTokenBalance → getUserLPPositions → getUnifiedPortfolioOverview
-# Result: Comprehensive portfolio analysis with recommendations
+### **Cross-Protocol Arbitrage**
+```
+getPrice → swap → lend → AI monitors → execute profit-taking
+"Find arbitrage opportunities between Soroswap and Blend, then execute automatically"
 ```
 
-**Complex Analysis Chain:**
-1. **Load Pool Metadata** → Get pool configuration and risk parameters
-2. **Get Token Balances** → Aggregate holdings across protocols
-3. **Get LP Positions** → Analyze liquidity provision performance
-4. **Get User Positions** → Cross-protocol position analysis
-5. **Yield Analysis** → Identify optimization opportunities
-6. **Risk Assessment** → Portfolio risk scoring and alerts
-
-### 2. **Advanced Yield Farming Strategy**
-
-```bash
-# Multi-protocol yield optimization
-"Find the best yield opportunities across Blend, Soroswap, and DeFindex"
-
-# Workflow: getAvailableSoroswapPools → getAvailableVaults → getYieldOpportunities → optimizeYield
+### **Advanced Yield Farming**
+```
+createVault → deposit → addLiquidity → AI rebalances → claimRewards
+"Create a DeFindex vault, add liquidity to Soroswap, and optimize for maximum yield"
 ```
 
-**Strategy Execution:**
-1. **Pool Discovery** → `getAvailableSoroswapPools()` - Find all available liquidity pools
-2. **Vault Analysis** → `getAvailableVaults()` - Identify DeFindex vault opportunities
-3. **Yield Comparison** → `getYieldOpportunities()` - Compare APYs across protocols
-4. **Position Optimization** → `optimizeYield()` - Generate rebalancing transactions
-5. **Risk Assessment** → `riskAnalysis()` - Ensure optimal risk/reward ratio
-
-### 3. **Cross-Protocol Arbitrage Workflow**
-
-```bash
-# Automated arbitrage detection and execution
-"Find arbitrage opportunities between Blend lending and Soroswap trading"
-
-# Workflow: getPrice → loadPoolData → swap → lend/borrow
+### **Risk Management**
+```
+loadPoolData → getUserPositions → AI calculates → rebalance if needed
+"Monitor my lending positions and rebalance if health factor drops below 1.5"
 ```
 
-**Arbitrage Chain:**
-1. **Price Discovery** → `getPrice()` - Get real-time asset prices
-2. **Pool Analysis** → `loadPoolData()` - Check lending rates and liquidity
-3. **Opportunity Detection** → Compare lending APY vs trading spreads
-4. **Execution Planning** → `swap()` + `lend()` - Execute arbitrage strategy
-5. **Position Monitoring** → Track arbitrage performance
-
-### 4. **Risk Management & Rebalancing**
-
-```bash
-# Automated portfolio rebalancing
-"Rebalance my portfolio to 40% XLM, 30% USDC, 20% BTC, 10% LP positions"
-
-# Workflow: getUnifiedPortfolioOverview → suggestRebalance → execute transactions
+### **Multi-Step DeFi Strategies**
+```
+borrow → swap → addLiquidity → createVault → AI manages
+"Borrow USDC from Blend, swap for XLM, provide liquidity, and farm yield"
 ```
 
-**Rebalancing Process:**
-1. **Current State** → `getUnifiedPortfolioOverview()` - Analyze current allocation
-2. **Target Calculation** → Calculate required trades for target allocation
-3. **Transaction Building** → `suggestRebalance()` - Generate optimal swap XDRs
-4. **Execution** → Execute rebalancing transactions
-5. **Verification** → Confirm new allocation matches targets
+## 🎯 Use Cases
 
-### 5. **Advanced Lending Strategy**
+### **For DeFi Users**
+- "Analyze my portfolio and suggest the best yield farming strategy"
+- "Swap 100 XLM to USDC and lend it to Blend for 8% APY"
+- "Create a DeFindex vault and deposit my USDC for auto-compounding"
 
-```bash
-# Complex lending optimization
-"Lend my XLM to Blend, then use borrowed USDC for Soroswap liquidity"
+### **For AI Developers**
+- Integrate Verbex AI's MCP tools into custom AI assistants
+- Build automated DeFi strategies using composable functions
+- Create cross-protocol arbitrage bots and yield optimizers
 
-# Workflow: loadPoolData → lend → borrow → addLiquidity
+### **For Protocol Developers**
+- Extend Verbex AI with new DeFi protocols
+- Add custom MCP tools for specialized financial operations
+- Integrate with existing DeFi infrastructure
+
+## 🎮 How to Use
+
+### **Web Assistant**
+1. Visit our [web app](https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app)
+2. Connect your Freighter wallet
+3. Start chatting with AI about your DeFi goals
+4. AI will execute complex strategies for you
+
+### **MCP Integration**
+1. Add our MCP server to your AI assistant configuration
+2. Use any of the 50+ DeFi functions
+3. AI can now execute blockchain operations directly
+
+### **Example Conversations**
+```
+You: "I want to optimize my portfolio for maximum yield"
+AI: Analyzes your positions → Executes strategy → Reports results
+
+You: "Swap 100 XLM to USDC and lend it to Blend"
+AI: Executes swap → Lends to pool → Confirms transaction
 ```
 
-**Lending Strategy:**
-1. **Pool Research** → `loadPoolData()` - Analyze lending pool parameters
-2. **Collateral Deposit** → `lend()` - Deposit XLM as collateral
-3. **Borrowing** → `borrow()` - Borrow USDC against XLM collateral
-4. **Liquidity Provision** → `addLiquidity()` - Add USDC to Soroswap pools
-5. **Yield Optimization** → Monitor and optimize lending/borrowing ratios
+## 🚀 What's Next
 
-### 6. **DeFindex Vault Management**
+### **Current Status**
+- ✅ Multi-protocol integration (Blend, Soroswap, DeFindex)
+- ✅ Conversational AI interface
+- ✅ MCP server with 50+ tools
+- ✅ Real-time portfolio analytics
 
-```bash
-# Advanced vault strategy
-"Create a DeFindex vault for USDC and optimize its performance"
+### **Future Plans**
+- 🔄 Advanced AI strategies and automation
+- 🔄 Cross-chain bridge integration
+- 🔄 Mobile app development
+- 🔄 Institutional features
 
-# Workflow: getAvailableStrategies → createVault → deposit → getVaultAnalytics
-```
+---
 
-**Vault Management:**
-1. **Strategy Selection** → `getAvailableStrategies()` - Choose optimal strategy
-2. **Vault Creation** → `createVault()` - Initialize new vault
-3. **Capital Deployment** → `deposit()` - Fund the vault
-4. **Performance Monitoring** → `getVaultAnalytics()` - Track vault performance
-5. **Optimization** → Adjust strategy based on analytics
+**Verbex AI** - Making DeFi accessible through AI conversations.
 
-### 7. **Multi-Step DeFi Operations**
+*Ready to try? Visit our [web app](https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app) or integrate our [MCP server](https://verbex-ai.onrender.com/sse).*
 
-```bash
-# Complex multi-protocol operation
-"Take 1000 XLM, swap 60% to USDC, lend 40% USDC to Blend, add 30% to Soroswap LP, create DeFindex vault with remaining 30%"
 
-# Workflow: swap → lend → addLiquidity → createVault → deposit
-```
-
-**Multi-Step Execution:**
-1. **Asset Conversion** → `swap()` - Convert XLM to USDC
-2. **Lending Position** → `lend()` - Create lending position
-3. **Liquidity Provision** → `addLiquidity()` - Add to Soroswap pools
-4. **Vault Creation** → `createVault()` - Set up DeFindex vault
-5. **Capital Allocation** → `deposit()` - Fund the vault
-
-### 8. **Portfolio Health Monitoring**
-
-```bash
-# Real-time portfolio monitoring
-"Monitor my portfolio health and alert me to any issues"
-
-# Workflow: getUnifiedPortfolioOverview → riskAnalysis → yieldAnalysis → generateAlerts
-```
-
-**Monitoring System:**
-1. **Portfolio Snapshot** → `getUnifiedPortfolioOverview()` - Current state
-2. **Risk Assessment** → `riskAnalysis()` - Identify risk factors
-3. **Yield Tracking** → `yieldAnalysis()` - Monitor performance
-4. **Health Scoring** → Calculate overall portfolio health
-5. **Alert Generation** → Notify on issues or opportunities
-
-### 9. **Advanced Trading Strategies**
-
-```bash
-# Sophisticated trading strategy
-"Execute a dollar-cost averaging strategy: buy 100 USDC worth of XLM every week"
-
-# Workflow: getPrice → swap → track performance → repeat
-```
-
-**Trading Automation:**
-1. **Market Analysis** → `getPrice()` - Get current market prices
-2. **Trade Execution** → `swap()` - Execute the trade
-3. **Performance Tracking** → Monitor trade outcomes
-4. **Strategy Adjustment** → Optimize based on results
-
-### 10. **Protocol Integration Workflows**
-
-```bash
-# Seamless protocol integration
-"Show me how to integrate Blend lending with Soroswap trading for maximum efficiency"
-
-# Workflow: loadPoolData → getAvailableSoroswapPools → analyzeIntegration → execute
-```
-
-**Integration Analysis:**
-1. **Protocol Research** → Analyze both protocols' capabilities
-2. **Opportunity Mapping** → Identify integration points
-3. **Strategy Development** → Create cross-protocol strategies
-4. **Execution Planning** → Plan optimal execution sequence
-
-### 11. **Advanced Analytics Workflows**
-
-```bash
-# Deep portfolio analytics
-"Provide deep analytics on my portfolio performance, risk metrics, and optimization opportunities"
-
-# Workflow: analyzePortfolio → getUnifiedYieldAnalysis → getCrossProtocolOpportunities → generateReport
-```
-
-**Analytics Pipeline:**
-1. **Portfolio Analysis** → `analyzePortfolio()` - Deep portfolio insights
-2. **Yield Analysis** → `getUnifiedYieldAnalysis()` - Cross-protocol yield comparison
-3. **Opportunity Detection** → `getCrossProtocolOpportunities()` - Find optimization opportunities
-4. **Report Generation** → Comprehensive analytics report
-
-### 12. **Emergency Response Workflows**
-
-```bash
-# Emergency portfolio protection
-"Emergency: Protect my portfolio from market volatility"
-
-# Workflow: riskAnalysis → suggestRebalance → execute defensive moves
-```
-
-**Emergency Protocol:**
-1. **Risk Assessment** → `riskAnalysis()` - Identify immediate risks
-2. **Defensive Strategy** → Generate protective measures
-3. **Quick Execution** → Execute defensive transactions
-4. **Monitoring** → Track effectiveness of protective measures
-
-## 🔄 Function Combination Examples
-
-### **Portfolio Management Combinations:**
-- `getUnifiedPortfolioOverview()` + `suggestRebalance()` + `optimizeYield()`
-- `loadPoolData()` + `getTokenBalance()` + `getUserLPPositions()`
-- `riskAnalysis()` + `yieldAnalysis()` + `getCrossProtocolOpportunities()`
-
-### **Trading Strategy Combinations:**
-- `getPrice()` + `swap()` + `addLiquidity()` + `getVaultAnalytics()`
-- `getAvailableSoroswapPools()` + `getYieldOpportunities()` + `optimizeYield()`
-- `loadPoolData()` + `lend()` + `borrow()` + `addLiquidity()`
-
-### **Analytics Combinations:**
-- `analyzePortfolio()` + `getUnifiedYieldAnalysis()` + `getDeFindexInsights()`
-- `getUserPositions()` + `getVaultAnalytics()` + `riskAnalysis()`
-- `getAvailableVaults()` + `getAvailableStrategies()` + `getYieldOpportunities()`
-
-### **Risk Management Combinations:**
-- `riskAnalysis()` + `suggestRebalance()` + `getCrossProtocolOpportunities()`
-- `getUnifiedPortfolioOverview()` + `riskAnalysis()` + `optimizeYield()`
-- `loadPoolData()` + `getTokenBalance()` + `riskAnalysis()`
-
-These workflows demonstrate the sophisticated capabilities of Verbex AI, enabling users to execute complex DeFi strategies through simple natural language commands while maintaining full control over their transactions and portfolio management.
-
-## 🛠️ Technical Implementation
-
-### Frontend Architecture
-
-- **Next.js 14**: App Router with server components
-- **TypeScript**: Full type safety across the stack
-- **Tailwind CSS**: Utility-first styling with custom retro theme
-- **Stellar-Wallets-Kit**: Secure wallet integration
-- **React Hooks**: Custom hooks for blockchain interactions
-
-### Backend Services
-
-- **MCP Server**: Model Context Protocol implementation
-- **Express.js**: RESTful API endpoints
-- **Prisma ORM**: Database management
-- **Stellar SDK**: Blockchain interactions
-- **Axios**: HTTP client for external APIs
-
-### Smart Contract Integration
-
-```typescript
-// Blend Protocol Integration
-const blendService = new BlendService();
-await blendService.loadPool(poolId, meta);
-
-// Soroswap Integration
-const soroswapService = new SoroswapService();
-await soroswapService.swap({
-  userAddress,
-  fromAsset: "XLM",
-  toAsset: "USDC",
-  amount: 100
-});
-
-// DeFindex Integration
-const defindexService = new DeFindexService();
-await defindexService.createVault({
-  userAddress,
-  asset: "USDC",
-  strategyId: "yield-farming-v1"
-});
-```
-
-## 📊 Supported Protocols & Assets
-
-### Blend Protocol (Lending/Borrowing)
-- **Assets**: XLM, USDC, BTC, ETH, XRP, EURC
-- **Features**: Collateralized lending, borrowing, interest earning
-- **Risk Management**: Liquidation protection, health factor monitoring
-
-### Soroswap (Decentralized Exchange)
-- **Assets**: 50+ tokens including XLM, USDC, BTC, ETH, XRP, AQUA
-- **Features**: AMM swaps, liquidity provision, route optimization
-- **Advanced**: Multi-hop swaps, price impact analysis
-
-### DeFindex (Yield Farming)
-- **Strategies**: Automated yield farming, vault management
-- **Features**: Strategy optimization, risk-adjusted returns
-- **Integration**: Cross-protocol yield opportunities
-
-## 🔧 Complete Function Reference
-
-### **Blend Protocol Functions**
-```typescript
-// Core Lending & Borrowing
-lend(userAddress, amount, asset, poolId)           // Deposit collateral
-withdraw(userAddress, amount, asset, poolId)       // Withdraw collateral
-borrow(userAddress, amount, asset, poolId)         // Borrow against collateral
-repay(userAddress, amount, asset, poolId)          // Repay borrowed amount
-
-// Pool Management
-loadPoolData(poolId, userAddress?)                 // Get pool details & user positions
-getAvailableBlendPools()                           // List all available pools
-loadPool(poolId)                                   // Load complete pool data
-loadPoolUser(poolId, userAddress)                  // Load user position data
-loadPoolOracle(poolId)                             // Load oracle data
-
-// Rewards & Analytics
-claimRewards(userAddress, poolId, reserveTokenIds) // Claim earned rewards
-getPoolEvents(poolId, version, startLedger)        // Get historical events
-
-// Token Operations
-getTokenBalance(tokenId, userAddress)              // Get token balance
-loadTokenMetadata(assetId)                         // Load token metadata
-
-// Admin Functions
-createPool(admin, name, oracleId, backstopRate, maxPositions, minCollateral)
-addReserve(admin, poolId, assetId, metadata)       // Add new asset to pool
-
-// Backstop Protocol
-loadBackstop(version)                              // Load backstop data
-loadBackstopPool(poolId, version)                  // Load backstop pool data
-loadBackstopPoolUser(poolId, version, userAddress) // Load user backstop position
-
-// Utilities
-getFeeStats()                                      // Get network fee statistics
-simulateOperation(operationXdr, userAddress)      // Simulate transaction
-buyNft(userAddress, nftContractId, tokenId, price) // Purchase NFT
-```
-
-### **Soroswap Protocol Functions**
-```typescript
-// Trading & Swaps
-swap(userAddress, fromAsset, toAsset, amount, maxSlippage?, routeType?)
 getPrice(asset, referenceCurrency?)                // Get asset price
 getAssetList()                                     // List all available assets
 
