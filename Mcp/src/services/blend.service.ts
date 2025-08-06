@@ -238,7 +238,7 @@ export class BlendService {
         .filter((b: any) => {
           // Use BigInt for safe comparison
           const bal = BigInt((b.balance || '0').replace('.', ''));
-          return bal > 0n;
+          return bal > BigInt(0);
         })
         .map((b: any) => {
           if (b.asset_type === 'native') {

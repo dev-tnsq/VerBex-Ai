@@ -14,8 +14,9 @@ import {
   signTransaction as kitSignTransaction,
 } from '@/lib/stellar-wallets-kit';
 import { Transaction, Networks } from '@stellar/stellar-sdk'; // Add stellar-sdk for debugging
+import {Suspense} from 'react';
 
-export default function PasskeySignPage() {
+function PasskeySignInner() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   
@@ -524,5 +525,13 @@ export default function PasskeySignPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function PasskeySignPage() {
+  return (
+    <Suspense fallback={<div>...</div>}>
+      <PasskeySignInner />
+    </Suspense>
   );
 }
