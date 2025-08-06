@@ -1,5 +1,7 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+  import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+  import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
+  import express from 'express';
+  import cors from 'cors';
 import { z } from 'zod';
 import { BlendService } from './services/blend.service.js';
 import { StellarService } from './services/stellar.service.js';
@@ -8,6 +10,11 @@ import { DeFindexService } from './services/defindex.service.js';
 import { UnifiedPortfolioService } from './services/portfolio.service.js';
 import { PoolV1, PoolV2 } from '@blend-capital/blend-sdk';
 import dotenv from 'dotenv';
+
+// Global type declaration for transaction results
+declare global {
+  var transactionResults: Map<string, any> | undefined;
+}
 
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION:', err);
@@ -20,7 +27,9 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 dotenv.config();
-
+const app = express();
+app.use(express.json());
+const transports: Record<string, any> = {};
 /**
  * Custom replacer function for JSON.stringify to handle BigInts.
  * @param key The key being serialized.
@@ -166,12 +175,14 @@ server.registerTool('lend', {
 }, async (params: TransactionParams) => {
     const result = await blendService.lend(params);
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=lend&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
         // Assume it's an XDR
-        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=lend&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Lend transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
 });
@@ -183,12 +194,14 @@ server.registerTool('withdraw-pool', {
 }, async (params: TransactionParams) => {
     const result = await blendService.withdraw(params);
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=withdraw&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
         // Assume it's an XDR
-        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=withdraw&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Withdraw transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
 });
@@ -200,12 +213,14 @@ server.registerTool('borrow', {
 }, async (params: TransactionParams) => {
     const result = await blendService.borrow(params);
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=borrow&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
         // Assume it's an XDR
-        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=borrow&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Borrow transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
 });
@@ -217,12 +232,14 @@ server.registerTool('repay', {
 }, async (params: TransactionParams) => {
     const result = await blendService.repay(params);
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=repay&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
         // Assume it's an XDR
-        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=repay&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Repay transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
 });
@@ -243,12 +260,14 @@ server.registerTool('claimRewards', {
 }, async (params: ClaimRewardsParams) => {
     const result = await blendService.claim(params);
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=claimRewards&userAddress=${params.userAddress}&poolId=${params.poolId}&reserveTokenIds=${encodeURIComponent(JSON.stringify(params.reserveTokenIds))}`;
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
         // Assume it's an XDR
-        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=claimRewards&userAddress=${params.userAddress}&poolId=${params.poolId}&reserveTokenIds=${encodeURIComponent(JSON.stringify(params.reserveTokenIds))}`;
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Claim rewards transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
 });
@@ -278,12 +297,14 @@ server.registerTool(
       minCollateral: BigInt(params.minCollateral),
     });
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=createPool&admin=${params.admin}&name=${encodeURIComponent(params.name)}&oracleId=${params.oracleId}&backstopRate=${params.backstopRate}&maxPositions=${params.maxPositions}&minCollateral=${params.minCollateral}`;
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
         // Assume it's an XDR
-        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=createPool&admin=${params.admin}&name=${encodeURIComponent(params.name)}&oracleId=${params.oracleId}&backstopRate=${params.backstopRate}&maxPositions=${params.maxPositions}&minCollateral=${params.minCollateral}`;
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Pool creation transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
   }
@@ -326,12 +347,14 @@ server.registerTool(
   async (params: AddReserveParams) => {
     const result = await blendService.addReserve(params);
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=addReserve&admin=${params.admin}&poolId=${params.poolId}&assetId=${params.assetId}`;
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
       // Assume it's an XDR
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=addReserve&admin=${params.admin}&poolId=${params.poolId}&assetId=${params.assetId}`;
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Add reserve transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
   }
@@ -353,12 +376,14 @@ server.registerTool(
   async ({ userAddress, nftContractId, tokenId, price, privateKey }) => {
     const result = await blendService.buyNft({ userAddress, nftContractId, tokenId, price, privateKey });
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.unsignedXDR }, null, 2) }] };
+      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=buyNft&userAddress=${userAddress}&nftContractId=${nftContractId}&tokenId=${tokenId}&price=${price}`;
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
       // Assume it's an XDR
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result }, null, 2) }] };
+      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=buyNft&userAddress=${userAddress}&nftContractId=${nftContractId}&tokenId=${tokenId}&price=${price}`;
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `NFT purchase transaction submitted. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
   }
@@ -459,7 +484,8 @@ server.registerTool(
   async (params) => {
     const result = await soroswapService.swap(params);
     if (result.xdr) {
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.xdr }, null, 2) }] };
+      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=swap&userAddress=${params.userAddress}&fromAsset=${params.fromAsset}&toAsset=${params.toAsset}&amount=${params.amount}&maxSlippage=${params.maxSlippage || 0.5}&routeType=${params.routeType || 'amm'}`;
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.xdr }, null, 2) }] };
     } else if (result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     }
@@ -484,7 +510,8 @@ server.registerTool(
   async (params) => {
     const result = await soroswapService.addLiquidity(params);
     if (result.xdr) {
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.xdr }, null, 2) }] };
+      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=addLiquidity&userAddress=${params.userAddress}&tokenA=${params.tokenA}&tokenB=${params.tokenB}&amountA=${params.amountA}&amountB=${params.amountB}&autoBalance=${params.autoBalance || false}`;
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.xdr }, null, 2) }] };
     } else if (result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     }
@@ -506,7 +533,8 @@ server.registerTool(
   async (params) => {
     const result = await soroswapService.removeLiquidity(params);
     if (result.xdr) {
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.xdr }, null, 2) }] };
+      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=removeLiquidity&userAddress=${params.userAddress}&poolId=${params.poolId}&lpAmount=${params.lpAmount}`;
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.xdr }, null, 2) }] };
     } else if (result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     }
@@ -626,7 +654,8 @@ server.registerTool(
   async (params) => {
     const result = await defindexService.createVault(params);
     if (result.xdr) {
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.xdr }, null, 2) }] };
+      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=createVault&userAddress=${params.userAddress}&asset=${params.asset}&strategyId=${params.strategyId}&initialDeposit=${params.initialDeposit || 0}&vaultName=${encodeURIComponent(params.vaultName || '')}`;
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.xdr }, null, 2) }] };
     } else if (result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     }
@@ -649,7 +678,8 @@ server.registerTool(
   async (params) => {
     const result = await defindexService.deposit(params);
     if (result.xdr) {
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.xdr }, null, 2) }] };
+      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=deposit&userAddress=${params.userAddress}&vaultId=${params.vaultId}&amount=${params.amount}&asset=${params.asset}`;
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.xdr }, null, 2) }] };
     } else if (result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     }
@@ -672,7 +702,8 @@ server.registerTool(
   async (params) => {
     const result = await defindexService.withdraw(params);
     if (result.xdr) {
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', unsignedXDR: result.xdr }, null, 2) }] };
+      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=withdraw-vault&userAddress=${params.userAddress}&vaultAddress=${params.vaultAddress}&amount=${params.amount}&asset=${params.asset}`;
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.xdr }, null, 2) }] };
     } else if (result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     }
@@ -681,15 +712,132 @@ server.registerTool(
 );
 
 
-
-// 3. Connect to a transport and run the server
-async function run() {
-  const transport = new StdioServerTransport();
+app.get('/sse',async (req, res) => {
+  console.log('Received GET request to /sse (SSE transport for Cursor)');
+  const transport = new SSEServerTransport('/messages', res);
+  
+  // Store transport for cleanup
+  const sessionId = transport.sessionId;
+  transports[sessionId] = transport;
+  
+  res.on("close", () => {
+    console.log(`SSE connection closed for session ${sessionId}`);
+    delete transports[sessionId];
+  });
+  
   await server.connect(transport);
-  console.error('Blend Protocol MCP Server connected via stdio and ready.');
-}
+});
+// 3. Connect to a transport and run the server
+app.post('/messages', async (req, res) => {
+  const sessionId = req.query.sessionId as string;
+  const transport = transports[sessionId];
+  
+  if (transport && transport instanceof SSEServerTransport) {
+    await transport.handlePostMessage(req, res, req.body);
+  } else {
+    res.status(400).send('No valid transport found for sessionId');
+  }
+});
 
-run().catch((err) => {
-  console.error('Failed to run MCP server:', err);
-  process.exit(1);
+// Health check endpoint
+app.get('/api/health', async (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Transaction result endpoint for receiving signed transaction results
+app.post('/api/transaction-result', async (req, res) => {
+  try {
+    const { transactionId, action, userAddress, poolId, amount, asset, txHash, signedXdr, status } = req.body;
+    
+    console.log(`[MCP Server] Received transaction result:`, {
+      transactionId,
+      action,
+      userAddress,
+      poolId,
+      amount,
+      asset,
+      txHash,
+      status
+    });
+
+    // Store the transaction result for Cursor to access
+    const transactionResult = {
+      transactionId,
+      action,
+      userAddress,
+      poolId,
+      amount,
+      asset,
+      txHash,
+      signedXdr,
+      status,
+      timestamp: new Date().toISOString()
+    };
+
+    // Store in memory for now (in production, you might want to use a database)
+    if (!global.transactionResults) {
+      global.transactionResults = new Map<string, any>();
+    }
+    global.transactionResults.set(transactionId, transactionResult);
+
+    // Log the success for Cursor to see
+    console.log(`[MCP Server] Transaction ${action} completed successfully for user ${userAddress}`);
+    console.log(`[MCP Server] Transaction Hash: ${txHash}`);
+    console.log(`[MCP Server] Amount: ${amount} ${asset}`);
+    if (poolId) {
+      console.log(`[MCP Server] Pool: ${poolId}`);
+    }
+
+    res.json({
+      success: true,
+      message: 'Transaction result received and stored',
+      transactionId
+    });
+
+  } catch (error: any) {
+    console.error('[MCP Server] Error processing transaction result:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to process transaction result'
+    });
+  }
+});
+
+// Endpoint to retrieve transaction results
+app.get('/api/transaction-result/:transactionId', async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+    
+    if (!global.transactionResults) {
+      return res.status(404).json({
+        success: false,
+        error: 'No transaction results available'
+      });
+    }
+
+    const result = global.transactionResults.get(transactionId);
+    if (result) {
+      global.transactionResults.delete(transactionId); // Remove after retrieval
+      res.json({
+        success: true,
+        transaction: result
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: 'Transaction result not found'
+      });
+    }
+
+  } catch (error: any) {
+    console.error('[MCP Server] Error retrieving transaction result:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to retrieve transaction result'
+    });
+  }
+});
+
+app.listen(3001, () => {
+  console.log('Mcp Server is running on port 3001');
 });

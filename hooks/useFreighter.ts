@@ -70,6 +70,7 @@ export function useFreighter() {
           ? 'Public Global Stellar Network ; September 2015'
           : 'Test SDF Network ; September 2015';
         const signedXDR = await kitSignTransaction(xdr, { networkPassphrase: passphrase });
+        console.log('[useFreighter] signedXDR:', signedXDR);
         return signedXDR;
       } catch (e: any) {
         setError(e.message || 'Failed to sign transaction.');

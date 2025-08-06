@@ -831,82 +831,47 @@ ${JSON.stringify(data.result, null, 2)}
 
               {pendingXdr && (
                 <div className="flex justify-start">
-                  <div className="rounded-2xl p-4 max-w-[80%] bg-gradient-to-r from-slate-800/60 to-slate-700/60 text-white border-2 border-purple-500/50 shadow-lg">
+                  <div className="max-w-[80%] bg-retro text-green-400 pixel-border font-pixel p-4 shadow-lg">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse"></div>
+                      <div className="w-3 h-3 bg-green-400 neon pixel-border animate-pulse"></div>
                       <div className="text-sm font-bold neon">Transaction Ready for Signature</div>
                     </div>
-                    {/* Show swap stats if Soroswap swap */}
-                    {pendingGemini && pendingGemini.operations && pendingGemini.operations[0]?.protocol === 'Soroswap' && pendingGemini.operations[0]?.action === 'swap' && (
-                      <div className="mb-4 p-3 bg-cyan-900/30 rounded-lg border border-cyan-700/50">
-                        <div className="text-sm neon font-bold mb-1">Swap Details</div>
-                        <div className="text-xs neon">
-                          {(() => {
-                            const op = pendingGemini.operations[0];
-                            const params = op.parameters || {};
-                            let from = params.fromAsset || '';
-                            let to = params.toAsset || '';
-                            let amount = params.amount || '';
-                            let expected = null;
-                            if (pendingBlend && pendingBlend.quote && pendingBlend.quote.amountOut) {
-                              expected = pendingBlend.quote.amountOut;
-                            }
-                            const fromMeta = getAssetMeta(from);
-                            const toMeta = getAssetMeta(to);
-                            return (
-                              <>
-                                <div>From: <span className="font-mono">{fromMeta.name} ({fromMeta.code})</span></div>
-                                <div>To: <span className="font-mono">{toMeta.name} ({toMeta.code})</span></div>
-                                <div>Amount: <span className="font-mono">{amount} {fromMeta.code}</span></div>
-                                {expected && <div>Expected Output: <span className="font-mono">{formatAmount(expected, toMeta.decimals)} {toMeta.code}</span></div>}
-                              </>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                    )}
-                    {pendingSummary && (
-                      <div className="mb-4 p-3 bg-purple-900/30 rounded-lg border border-purple-700/50">
-                        <div className="text-sm neon">{pendingSummary}</div>
-                      </div>
-                    )}
-                    
+                    <div className="mb-4 p-3 bg-retro pixel-border text-green-200">
+                      Please sign this transaction with your wallet.
+                    </div>
                     <details className="mb-4">
                       <summary className="cursor-pointer neon text-xs hover:text-green-300">View Transaction XDR</summary>
-                      <pre className="text-xs whitespace-pre-wrap break-all mt-2 bg-slate-900 p-2 rounded border overflow-auto max-h-32">{pendingXdr}</pre>
+                      <pre className="text-xs whitespace-pre-wrap break-all mt-2 bg-retro pixel-border p-2 text-green-300 overflow-auto max-h-32">{pendingXdr}</pre>
                     </details>
-                    
-                    <div className="flex gap-2">
-                        <Button
-                        onClick={handleSignAndSubmit} 
-                        disabled={signing || !connected} 
-                        className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0 font-bold"
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={handleSignAndSubmit}
+                        disabled={signing || !connected}
+                        className="flex-1 button-retro neon bg-retro text-green-300 border-2 border-green-400 pixel-border font-pixel py-2 px-4 text-base shadow-green-glow hover:bg-green-900 hover:text-green-200 transition"
                       >
                         {signing ? (
                           <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-4 h-4 border-2 border-green-300 border-t-transparent rounded-none animate-spin neon"></div>
                             Signing...
                           </div>
                         ) : (
                           "✍️ Sign & Submit Transaction"
                         )}
-                        </Button>
-                        <Button
+                      </button>
+                      <button
                         onClick={() => {
                           setPendingXdr(null);
                           setPendingSummary(null);
                           setPendingGemini(null);
                           setPendingBlend(null);
                         }}
-                        variant="outline"
-                        className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
+                        className="button-retro neon bg-retro text-red-400 border-2 border-red-500 pixel-border font-pixel py-2 px-4 text-base hover:bg-red-900 hover:text-red-200 transition"
                       >
                         Cancel
-                        </Button>
+                      </button>
                     </div>
-                    
                     {!connected && (
-                      <div className="mt-2 text-xs neon bg-amber-900/20 p-2 rounded">
+                      <div className="mt-2 text-xs neon bg-yellow-900/20 p-2 pixel-border">
                         ⚠️ Connect your wallet to sign transactions
                       </div>
                     )}
@@ -916,11 +881,11 @@ ${JSON.stringify(data.result, null, 2)}
 
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="rounded-2xl p-4 max-w-[80%] bg-slate-800/50 text-white border border-purple-800/30">
+                  <div className="rounded-2xl p-4 max-w-[80%] bg-retro text-green-400 border-2 border-green-500 pixel-border shadow-lg">
                     <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                      <div className="w-2 h-2 bg-green-400 neon rounded-full animate-bounce shadow-green-glow"></div>
+                      <div className="w-2 h-2 bg-green-400 neon rounded-full animate-bounce shadow-green-glow" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-green-400 neon rounded-full animate-bounce shadow-green-glow" style={{ animationDelay: '0.2s' }}></div>
                     </div>
                   </div>
                 </div>
