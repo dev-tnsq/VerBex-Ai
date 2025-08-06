@@ -1,7 +1,7 @@
-  import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-  import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
-  import express from 'express';
-  import cors from 'cors';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
+import express from 'express';
+import cors from 'cors';
 import { z } from 'zod';
 import { BlendService } from './services/blend.service.js';
 import { StellarService } from './services/stellar.service.js';
@@ -29,6 +29,7 @@ process.on('unhandledRejection', (reason, promise) => {
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(cors());
 const transports: Record<string, any> = {};
 /**
  * Custom replacer function for JSON.stringify to handle BigInts.
