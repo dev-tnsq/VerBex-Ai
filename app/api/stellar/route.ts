@@ -15,8 +15,12 @@ export async function POST(req: NextRequest) {
     // Parse the signed transaction
     const transaction = new Transaction(signedXdr, Networks.TESTNET);
     
+    console.log(`[Stellar API] Submitting transaction to network: ${transaction.hash().toString('hex')}`);
+    
     // Submit to Stellar network
     const result = await server.submitTransaction(transaction);
+    
+    console.log(`[Stellar API] Transaction submitted successfully: ${result.hash}`);
     
     return NextResponse.json({
       success: true,
