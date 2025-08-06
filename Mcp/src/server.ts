@@ -176,13 +176,13 @@ server.registerTool('lend', {
 }, async (params: TransactionParams) => {
     const result = await blendService.lend(params);
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=lend&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=lend&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
         // Assume it's an XDR
-        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=lend&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result)}&action=lend&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Lend transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
@@ -195,13 +195,13 @@ server.registerTool('withdraw-pool', {
 }, async (params: TransactionParams) => {
     const result = await blendService.withdraw(params);
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=withdraw&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=withdraw&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
         // Assume it's an XDR
-        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=withdraw&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result)}&action=withdraw&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Withdraw transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
@@ -214,13 +214,13 @@ server.registerTool('borrow', {
 }, async (params: TransactionParams) => {
     const result = await blendService.borrow(params);
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=borrow&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=borrow&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
         // Assume it's an XDR
-        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=borrow&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result)}&action=borrow&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Borrow transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
@@ -233,13 +233,13 @@ server.registerTool('repay', {
 }, async (params: TransactionParams) => {
     const result = await blendService.repay(params);
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=repay&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=repay&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
         // Assume it's an XDR
-        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=repay&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
+        const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result)}&action=repay&userAddress=${params.userAddress}&poolId=${params.poolId}&amount=${params.amount}&asset=${params.asset}`;
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Repay transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
@@ -261,13 +261,13 @@ server.registerTool('claimRewards', {
 }, async (params: ClaimRewardsParams) => {
     const result = await blendService.claim(params);
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=claimRewards&userAddress=${params.userAddress}&poolId=${params.poolId}&reserveTokenIds=${encodeURIComponent(JSON.stringify(params.reserveTokenIds))}`;
+        const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=claimRewards&userAddress=${params.userAddress}&poolId=${params.poolId}&reserveTokenIds=${encodeURIComponent(JSON.stringify(params.reserveTokenIds))}`;
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
         // Assume it's an XDR
-        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=claimRewards&userAddress=${params.userAddress}&poolId=${params.poolId}&reserveTokenIds=${encodeURIComponent(JSON.stringify(params.reserveTokenIds))}`;
+        const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result)}&action=claimRewards&userAddress=${params.userAddress}&poolId=${params.poolId}&reserveTokenIds=${encodeURIComponent(JSON.stringify(params.reserveTokenIds))}`;
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Claim rewards transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
@@ -298,13 +298,13 @@ server.registerTool(
       minCollateral: BigInt(params.minCollateral),
     });
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=createPool&admin=${params.admin}&name=${encodeURIComponent(params.name)}&oracleId=${params.oracleId}&backstopRate=${params.backstopRate}&maxPositions=${params.maxPositions}&minCollateral=${params.minCollateral}`;
+        const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=createPool&admin=${params.admin}&name=${encodeURIComponent(params.name)}&oracleId=${params.oracleId}&backstopRate=${params.backstopRate}&maxPositions=${params.maxPositions}&minCollateral=${params.minCollateral}`;
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
         // Assume it's an XDR
-        const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=createPool&admin=${params.admin}&name=${encodeURIComponent(params.name)}&oracleId=${params.oracleId}&backstopRate=${params.backstopRate}&maxPositions=${params.maxPositions}&minCollateral=${params.minCollateral}`;
+        const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result)}&action=createPool&admin=${params.admin}&name=${encodeURIComponent(params.name)}&oracleId=${params.oracleId}&backstopRate=${params.backstopRate}&maxPositions=${params.maxPositions}&minCollateral=${params.minCollateral}`;
         return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Pool creation transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
@@ -348,13 +348,13 @@ server.registerTool(
   async (params: AddReserveParams) => {
     const result = await blendService.addReserve(params);
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=addReserve&admin=${params.admin}&poolId=${params.poolId}&assetId=${params.assetId}`;
+      const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=addReserve&admin=${params.admin}&poolId=${params.poolId}&assetId=${params.assetId}`;
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
       // Assume it's an XDR
-      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=addReserve&admin=${params.admin}&poolId=${params.poolId}&assetId=${params.assetId}`;
+      const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result)}&action=addReserve&admin=${params.admin}&poolId=${params.poolId}&assetId=${params.assetId}`;
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `Add reserve transaction submitted successfully. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
@@ -377,13 +377,13 @@ server.registerTool(
   async ({ userAddress, nftContractId, tokenId, price, privateKey }) => {
     const result = await blendService.buyNft({ userAddress, nftContractId, tokenId, price, privateKey });
     if (result && typeof result === 'object' && result.status === 'NEEDS_SIGNATURE') {
-      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=buyNft&userAddress=${userAddress}&nftContractId=${nftContractId}&tokenId=${tokenId}&price=${price}`;
+      const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.unsignedXDR)}&action=buyNft&userAddress=${userAddress}&nftContractId=${nftContractId}&tokenId=${tokenId}&price=${price}`;
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.unsignedXDR }, null, 2) }] };
     } else if (result && typeof result === 'object' && result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
     } else if (typeof result === 'string' && result.length > 40) {
       // Assume it's an XDR
-      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result)}&action=buyNft&userAddress=${userAddress}&nftContractId=${nftContractId}&tokenId=${tokenId}&price=${price}`;
+      const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result)}&action=buyNft&userAddress=${userAddress}&nftContractId=${nftContractId}&tokenId=${tokenId}&price=${price}`;
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result }, null, 2) }] };
     }
     return { content: [{ type: 'text', text: `NFT purchase transaction submitted. Result: ${JSON.stringify(result, jsonReplacer, 2)}` }] };
@@ -485,7 +485,7 @@ server.registerTool(
   async (params) => {
     const result = await soroswapService.swap(params);
     if (result.xdr) {
-      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=swap&userAddress=${params.userAddress}&fromAsset=${params.fromAsset}&toAsset=${params.toAsset}&amount=${params.amount}&maxSlippage=${params.maxSlippage || 0.5}&routeType=${params.routeType || 'amm'}`;
+      const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=swap&userAddress=${params.userAddress}&fromAsset=${params.fromAsset}&toAsset=${params.toAsset}&amount=${params.amount}&maxSlippage=${params.maxSlippage || 0.5}&routeType=${params.routeType || 'amm'}`;
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.xdr }, null, 2) }] };
     } else if (result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
@@ -511,7 +511,7 @@ server.registerTool(
   async (params) => {
     const result = await soroswapService.addLiquidity(params);
     if (result.xdr) {
-      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=addLiquidity&userAddress=${params.userAddress}&tokenA=${params.tokenA}&tokenB=${params.tokenB}&amountA=${params.amountA}&amountB=${params.amountB}&autoBalance=${params.autoBalance || false}`;
+      const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=addLiquidity&userAddress=${params.userAddress}&tokenA=${params.tokenA}&tokenB=${params.tokenB}&amountA=${params.amountA}&amountB=${params.amountB}&autoBalance=${params.autoBalance || false}`;
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.xdr }, null, 2) }] };
     } else if (result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
@@ -534,7 +534,7 @@ server.registerTool(
   async (params) => {
     const result = await soroswapService.removeLiquidity(params);
     if (result.xdr) {
-      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=removeLiquidity&userAddress=${params.userAddress}&poolId=${params.poolId}&lpAmount=${params.lpAmount}`;
+      const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=removeLiquidity&userAddress=${params.userAddress}&poolId=${params.poolId}&lpAmount=${params.lpAmount}`;
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.xdr }, null, 2) }] };
     } else if (result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
@@ -655,7 +655,7 @@ server.registerTool(
   async (params) => {
     const result = await defindexService.createVault(params);
     if (result.xdr) {
-      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=createVault&userAddress=${params.userAddress}&asset=${params.asset}&strategyId=${params.strategyId}&initialDeposit=${params.initialDeposit || 0}&vaultName=${encodeURIComponent(params.vaultName || '')}`;
+      const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=createVault&userAddress=${params.userAddress}&asset=${params.asset}&strategyId=${params.strategyId}&initialDeposit=${params.initialDeposit || 0}&vaultName=${encodeURIComponent(params.vaultName || '')}`;
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.xdr }, null, 2) }] };
     } else if (result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
@@ -679,7 +679,7 @@ server.registerTool(
   async (params) => {
     const result = await defindexService.deposit(params);
     if (result.xdr) {
-      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=deposit&userAddress=${params.userAddress}&vaultId=${params.vaultId}&amount=${params.amount}&asset=${params.asset}`;
+      const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=deposit&userAddress=${params.userAddress}&vaultId=${params.vaultId}&amount=${params.amount}&asset=${params.asset}`;
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.xdr }, null, 2) }] };
     } else if (result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
@@ -703,7 +703,7 @@ server.registerTool(
   async (params) => {
     const result = await defindexService.withdraw(params);
     if (result.xdr) {
-      const signingUrl = `http://localhost:3000/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=withdraw-vault&userAddress=${params.userAddress}&vaultAddress=${params.vaultAddress}&amount=${params.amount}&asset=${params.asset}`;
+      const signingUrl = `https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app/passkey/sign?xdr=${encodeURIComponent(result.xdr)}&action=withdraw-vault&userAddress=${params.userAddress}&vaultAddress=${params.vaultAddress}&amount=${params.amount}&asset=${params.asset}`;
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'NEEDS_SIGNATURE', signingUrl: signingUrl, unsignedXDR: result.xdr }, null, 2) }] };
     } else if (result.txHash) {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'SUCCESS', txHash: result.txHash }, null, 2) }] };
