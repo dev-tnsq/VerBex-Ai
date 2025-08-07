@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.jpg" alt="Verbex AI Logo" width="200"/>
+  <img src="./public/logo.jpg" alt="Verbex AI Logo" width="200"/>
   
   # 🚀 Verbex AI - Agentic DeFi Assistant
   
@@ -14,7 +14,7 @@
 ## 🏠 Landing Page Preview
 
 <div align="center">
-  <img src="landing.ong" alt="Verbex AI Landing Page" width="800"/>
+  <img src="./public/landing.png" alt="Verbex AI Landing Page" width="800"/>
   <br/>
   <em>Experience the future of DeFi conversations</em>
 </div>
