@@ -585,7 +585,7 @@ ${JSON.stringify(data.result, null, 2)}
         <SidebarHeader>
               <div className="flex items-center gap-3">
             <div className="w-10 h-10 pixel-border bg-retro flex items-center justify-center shadow-md">
-                  <Coins className="w-6 h-6 neon" />
+                <img src="/logo.jpg" alt="Verbex AI Logo" className="w-15 h-10" />
                 </div>
             {state === "expanded" && (
                 <div>
