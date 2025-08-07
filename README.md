@@ -1,6 +1,23 @@
-# 🚀 Verbex AI - Agentic DeFi Assistant
+<div align="center">
+  <img src="logo.jpg" alt="Verbex AI Logo" width="200"/>
+  
+  # 🚀 Verbex AI - Agentic DeFi Assistant
+  
+  > **AI-powered DeFi assistant with MCP integration for Stellar blockchain**
+  [![Live Demo](https://img.shields.io/badge/Live-Demo%20App-green?style=for-the-badge)](https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app)
+  [![MCP Server](https://img.shields.io/badge/MCP-Server-blue?style=for-the-badge)](https://verbex-ai.onrender.com/sse)
+</div>
 
-> **AI-powered DeFi assistant with MCP integration for Stellar blockchain**
+## 🎬 Demo Video
+
+
+## 🏠 Landing Page Preview
+
+<div align="center">
+  <img src="landing.ong" alt="Verbex AI Landing Page" width="800"/>
+  <br/>
+  <em>Experience the future of DeFi conversations</em>
+</div>
 
 ## 🎯 Project Overview
 
