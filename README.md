@@ -4,6 +4,7 @@
   # 🚀 Verbex AI - Agentic DeFi Assistant
   
   > **AI-powered DeFi assistant with MCP integration for Stellar blockchain**
+> 
   [![Live Demo](https://img.shields.io/badge/Live-Demo%20App-green?style=for-the-badge)](https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app)
   [![MCP Server](https://img.shields.io/badge/MCP-Server-blue?style=for-the-badge)](https://verbex-ai.onrender.com/sse)
 </div>
@@ -11,13 +12,7 @@
 ## 🎬 Demo Video
 
 
-## 🏠 Landing Page Preview
-
-<div align="center">
-  <img src="./public/landing.png" alt="Verbex AI Landing Page" width="800"/>
-  <br/>
-  <em>Experience the future of DeFi conversations</em>
-</div>
+https://github.com/user-attachments/assets/03f1c0c0-b14b-43c5-8f70-a745c5fa189a
 
 ## 🎯 Project Overview
 
@@ -39,6 +34,12 @@ Verbex AI transforms complex DeFi operations into simple conversations. We provi
 ### **🌐 Web Assistant**
 **URL**: [https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app](https://verbex-cbbtl89kx-tanishq162005-gmailcoms-projects.vercel.app)
 
+<div align="center">
+  <img src="./public/landing.png" alt="Verbex AI Landing Page" width="800"/>
+  <br/>
+  <em>Experience the future of DeFi conversations</em>
+</div>
+
 **Features**:
 - Chat with AI about your DeFi goals
 - Real-time portfolio analytics
@@ -48,14 +49,19 @@ Verbex AI transforms complex DeFi operations into simple conversations. We provi
 ### **🔗 MCP Server**
 **URL**: [https://verbex-ai.onrender.com/sse](https://verbex-ai.onrender.com/sse)
 
+
 **Features**:
-- 50+ DeFi tools accessible to any AI
+- 30+ DeFi tools accessible to any AI
 - Works with Claude, ChatGPT, or custom AI
 - Real-time blockchain data
 - Secure transaction execution
 
+<div align="center">
+<img width="643" height="377" alt="Screenshot 2025-08-07 at 5 33 22 AM" src="https://github.com/user-attachments/assets/39f5ea46-a539-484b-8c40-948ecf793a79" />
+</div>
+
 ### **📚 GitHub**
-**Repository**: [https://github.com/your-username/VerbexAi](https://github.com/your-username/VerbexAi)
+**Repository**: [https://github.com/dev-tnsq/VerBex-Ai](https://github.com/dev-tnsq/VerBex-Ai)
 
 ## 🚀 Quick Setup
 
@@ -180,7 +186,7 @@ borrow → swap → addLiquidity → createVault → AI manages
 
 ### **MCP Integration**
 1. Add our MCP server to your AI assistant configuration
-2. Use any of the 50+ DeFi functions
+2. Use any of the 30+ DeFi functions
 3. AI can now execute blockchain operations directly
 
 ### **Example Conversations**
@@ -197,16 +203,9 @@ AI: Executes swap → Lends to pool → Confirms transaction
 ### **Current Status**
 - ✅ Multi-protocol integration (Blend, Soroswap, DeFindex)
 - ✅ Conversational AI interface
-- ✅ MCP server with 50+ tools
+- ✅ MCP server with 30+ tools
 - ✅ Real-time portfolio analytics
 
-### **Future Plans**
-- 🔄 Advanced AI strategies and automation
-- 🔄 Cross-chain bridge integration
-- 🔄 Mobile app development
-- 🔄 Institutional features
-
----
 
 **Verbex AI** - Making DeFi accessible through AI conversations.
 
@@ -326,99 +325,18 @@ getSoroswapPortfolioOverview(userAddress)          // Soroswap-specific portfoli
 - `buyNft()` - Purchase NFTs
 - `getPoolEvents()` - Get historical events
 
-## 🔐 Security Features
-
-- **Passkey Authentication**: Secure wallet connection
-- **Transaction Signing**: Dedicated signing pages with clear details
-- **Error Handling**: Comprehensive error management and user feedback
-- **Rate Limiting**: API protection against abuse
-- **Input Validation**: Zod schemas for all user inputs
-
-## 🎨 UI/UX Features
-
-### Retro-Futuristic Design
-- **Neon Green Theme**: Gaming-inspired color scheme
-- **Pixel Borders**: Nostalgic design elements
-- **Smooth Animations**: Modern micro-interactions
-- **Responsive Design**: Mobile-first approach
-
-### User Experience
-- **Conversational Interface**: Natural language DeFi interactions
-- **Real-Time Updates**: Live portfolio and transaction status
-- **Progressive Disclosure**: Complex features revealed gradually
-- **Error Recovery**: Clear error messages and recovery paths
-
-## 🚀 Deployment
-
-### Vercel Deployment
-
-```bash
-# Build command for Vercel
-yarn install && cd Mcp && yarn install && cd .. && npx prisma generate && npx prisma migrate deploy && yarn build
-
-# Environment variables in Vercel dashboard
-DATABASE_URL="your-production-db-url"
-STELLAR_NETWORK="testnet"
-MCP_SERVER_URL="your-mcp-server-url"
-GEMINI_API_KEY="your-gemini-api-key"
-```
-
-### MCP Server Deployment
-
-```bash
-# Deploy MCP server separately
-cd Mcp
-yarn build
-yarn start:prod
-```
-
-## 📈 Performance & Scalability
-
-- **Server-Side Rendering**: Fast initial page loads
-- **Caching Strategy**: Redis for API responses
-- **Database Optimization**: Indexed queries for portfolio data
-- **CDN Integration**: Static asset delivery
-- **Load Balancing**: Horizontal scaling support
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Setup
-
-```bash
-# Fork and clone
-git clone https://github.com/your-username/VerbexAi.git
-
-# Create feature branch
-git checkout -b feature/amazing-feature
-
-# Make changes and test
-yarn test
-yarn lint
-
-# Submit pull request
-git push origin feature/amazing-feature
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
 - **Stellar Development Foundation** for the blockchain infrastructure
 - **Blend Protocol** for lending/borrowing capabilities
-- **Soroswap** for DEX functionality
+- **Soroswap** for swap functionality
 - **DeFindex** for yield farming strategies
 - **Google Gemini** for AI capabilities
 - **Model Context Protocol** for AI integration
 
-## 📞 Support
-
-- **Documentation**: [docs.verbex.ai](https://docs.verbex.ai)
-- **Discord**: [discord.gg/verbex](https://discord.gg/verbex)
-- **Twitter**: [@VerbexAI](https://twitter.com/VerbexAI)
+## 📞 Socials
+- **Twitter**: [@VerbexAI](https://x.com/verbexAi)
 
 
 ---
